@@ -9,8 +9,7 @@ fit_models_by_lag(
   response,
   predictors,
   random = "",
-  model = c("LM", "GLM"),
-  family = gaussian(),
+  family = "gaussian()",
   min_n = 10,
   track = F,
   ...
@@ -29,14 +28,12 @@ will result in an error.}
 
 \item{random}{Optional character string specifying random-effects terms
 to be added to the model formula (without a leading \code{+}), e.g.
-\code{"(1 | site/year)"} or \code{"(1 | site) + (1 | year)"}.
+\code{"(1 | site/year)"} or \code{"(1 | site) + (1 | year)"} (\code{?glmmTMB::glmmTMB}).
 If empty (default), a fixed-effect model is fitted.}
 
-\item{model}{Character string specifying the model type. Either
-\code{"LM"} for linear models or \code{"GLM"} for generalized linear models.}
-
-\item{family}{A description of the error distribution and link function
-to be used in GLM or GLMM models. Ignored for linear models.}
+\item{family}{Character string. The name of a family function
+to be used in GLM or GLMM models. Default to "gaussian" (Linear model).
+see \code{?stats::family} and \code{?glmmTMB::family_glmmTMB}}
 
 \item{min_n}{Minimum number of observations required to fit a model.
 (Currently not enforced; retained for future extensions.)}
@@ -44,8 +41,7 @@ to be used in GLM or GLMM models. Ignored for linear models.}
 \item{track}{If TRUE, lag window is printed in the console before model fitting.}
 
 \item{...}{Additional arguments passed to the underlying modelling
-function (\code{lm}, \code{glm}, \code{lme4::lmer}, or
-\code{glmmTMB::glmmTMB}).}
+function (\code{glm}, or \code{glmmTMB::glmmTMB}).}
 }
 \value{
 A data frame with one row per lag window, containing:
@@ -69,13 +65,10 @@ for the specified predictor.
 }
 \details{
 Both fixed-effect and mixed-effect models are supported.
-The modelling function used depends on the combination of \code{model} and
-\code{random} arguments:
+The modelling function used depends on the \code{random} arguments:
 \itemize{
-  \item \code{model = "LM"} and \code{random = ""}: \code{\link[stats]{lm}}
-  \item \code{model = "GLM"} and \code{random = ""}: \code{\link[stats]{glm}}
-  \item \code{model = "LM"} and \code{random != ""}: \code{\link[lme4]{lmer}}
-  \item \code{model = "GLM"} and \code{random != ""}: \code{\link[glmmTMB]{glmmTMB}}
+  \item \code{random = ""}:  \code{\link[stats]{glm}}
+  \item \code{random != ""}: \code{\link[glmmTMB]{glmmTMB}}
 }
 
 For mixed-effects models, marginal R^2 (Nakagawa) is returned. For fixed-effects
@@ -98,7 +91,6 @@ visualisation, or sensitivity analyses in epidemiological or ecological
 studies.
 }
 \seealso{
-\code{\link[lme4]{lmer}},
 \code{\link[glmmTMB]{glmmTMB}},
 \code{\link[performance]{r2}},
 \code{\link[performance]{r2_nakagawa}}

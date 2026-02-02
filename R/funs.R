@@ -76,13 +76,10 @@ plotCCM <- function(data,
 #' for the specified predictor.
 #'
 #' Both fixed-effect and mixed-effect models are supported.
-#' The modelling function used depends on the combination of \code{model} and
-#' \code{random} arguments:
+#' The modelling function used depends on the \code{random} arguments:
 #' \itemize{
-#'   \item \code{model = "LM"} and \code{random = ""}: \code{\link[stats]{lm}}
-#'   \item \code{model = "GLM"} and \code{random = ""}: \code{\link[stats]{glm}}
-#'   \item \code{model = "LM"} and \code{random != ""}: \code{\link[lme4]{lmer}}
-#'   \item \code{model = "GLM"} and \code{random != ""}: \code{\link[glmmTMB]{glmmTMB}}
+#'   \item \code{random = ""}:  \code{\link[stats]{glm}}
+#'   \item \code{random != ""}: \code{\link[glmmTMB]{glmmTMB}}
 #' }
 #'
 #' For mixed-effects models, marginal R^2 (Nakagawa) is returned. For fixed-effects
@@ -100,14 +97,12 @@ plotCCM <- function(data,
 #'
 #' @param random Optional character string specifying random-effects terms
 #'   to be added to the model formula (without a leading \code{+}), e.g.
-#'   \code{"(1 | site/year)"} or \code{"(1 | site) + (1 | year)"}.
+#'   \code{"(1 | site/year)"} or \code{"(1 | site) + (1 | year)"} (\code{?glmmTMB::glmmTMB}).
 #'   If empty (default), a fixed-effect model is fitted.
 #'
-#' @param model Character string specifying the model type. Either
-#'   \code{"LM"} for linear models or \code{"GLM"} for generalized linear models.
-#'
-#' @param family A description of the error distribution and link function
-#'   to be used in GLM or GLMM models. Ignored for linear models.
+#' @param family Character string. The name of a family function
+#'   to be used in GLM or GLMM models. Default to "gaussian" (Linear model).
+#'   see \code{?stats::family} and \code{?glmmTMB::family_glmmTMB}
 #'
 #' @param min_n Minimum number of observations required to fit a model.
 #'   (Currently not enforced; retained for future extensions.)
@@ -115,8 +110,7 @@ plotCCM <- function(data,
 #' @param track If TRUE, lag window is printed in the console before model fitting.
 #'
 #' @param ... Additional arguments passed to the underlying modelling
-#'   function (\code{lm}, \code{glm}, \code{lme4::lmer}, or
-#'   \code{glmmTMB::glmmTMB}).
+#'   function (\code{glm}, or \code{glmmTMB::glmmTMB}).
 #'
 #' @details
 #' For each unique combination of \code{lag_start} and \code{lag_end}, the
@@ -146,28 +140,21 @@ plotCCM <- function(data,
 #'   }
 #'
 #' @seealso
-#' \code{\link[lme4]{lmer}},
 #' \code{\link[glmmTMB]{glmmTMB}},
 #' \code{\link[performance]{r2}},
 #' \code{\link[performance]{r2_nakagawa}}
 #'
-#' @importFrom glmmTMB glmmTMB nbinom2 nbinom1 compois truncated_compois genpois truncated_genpois truncated_poisson truncated_nbinom2 truncated_nbinom1 beta_family betabinomial tweedie lognormal ziGamma t_family ordbeta
-#' @importFrom stats lm glm as.formula gaussian binomial Gamma inverse.gaussian poisson quasi quasibinomial quasipoisson
-#' @importFrom lme4 lmer
-#' @importFrom performance r2 r2_nakagawa
 #' @export
 fit_models_by_lag <- function(data,
 															response,
 															predictors,
 															random = "", # Random-effects terms to be added to the formulae, wihtout initial "+", e.g. "(a|b/c)+(a|d)"
-															model = c("LM", "GLM"),
-															family = gaussian(),
+															family = "gaussian()",
 															min_n = 10,
 															track = F,
 															...) {
 
 	out <- data
-	model <- match.arg(model)
 
 	# Ensure response exists
 	stopifnot(response %in% names(out))
@@ -227,34 +214,20 @@ fit_models_by_lag <- function(data,
 		}
 
 		# Fit model
-		if (model == "LM" & mixed == T){
-			fit <- lmer(fml, data = dat, ...)
-			fit_null <- lmer(fml_null, data = dat, ...)
-			r2 <- r2_nakagawa(fit, null_model = fit_null)[[2]]
-		} else if (model == "GLM" & mixed == T){
+		if (mixed == T){
 			fit <- glmmTMB(fml, data = dat, family = family, ...)
 			fit_null <- glmmTMB(fml_null, data = dat, family = family, ...)
 			r2 <- r2_nakagawa(fit, null_model = fit_null)[[2]]
-		} else if (model == "LM" & mixed == F){
-			fit <- lm(fml, data = dat, ...)
-			r2 <- r2(fit)[[1]]
-		} else if (model == "GLM" & mixed == F){
-			fit <- glm(fml, data = dat, family = family, ...)
-			r2 <- r2(fit)[[1]]
-		}
-
-
-		sm <- summary(fit)
-
-		if (model == "GLM" & mixed == T){
+			sm <- summary(fit)
 			pval <- sm$coefficients$cond[predictors[1],4]
 			sign <- sign(sm$coefficients$cond[predictors[1],1])
 		} else {
+			fit <- glm(fml, data = dat, family = family, ...)
+			r2 <- r2(fit)[[1]]
+			sm <- summary(fit)
 			pval <- sm$coefficients[predictors[1],4]
 			sign <- sign(sm$coefficients[predictors[1],1])
 		}
-
-
 
 
 		results[[k]] <- data.frame(

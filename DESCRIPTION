@@ -26,7 +26,6 @@ LazyData: true
 RoxygenNote: 7.3.3
 Imports: 
     glmmTMB,
-    lme4,
     ggplot2,
     stats,
     performance
