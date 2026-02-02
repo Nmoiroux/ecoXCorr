@@ -111,8 +111,7 @@ res_glm <- fit_models_by_lag(
   data       = data,
   response   = "individualCount",
   predictors = "temp_mean_mean",
-  model      = "GLM",
-  family     = poisson(link = "log")
+  family     = "poisson")
 )
 ```
 
@@ -140,20 +139,17 @@ res_glmm <- fit_models_by_lag(
   data       = data,
   response   = "individualCount",
   predictors = "temp_mean_mean",
-  model      = "GLM",
   random     = "(1|area/trap)",
-  family     = truncated_nbinom2(link = "log")
+  family     = "truncated_nbinom2")
 )
 
 plotCCM(res_glmm, threshold_p = 0.2)
 ```
 
-The modelling function used depends on the combination of `model` and `random` arguments:
+The modelling function used depends on the `random` arguments:
 
-- `model = "LM"`  and `random = ""`:  `stats::lm()`
-- `model = "GLM"` and `random = ""`:  `stats::glm()`
-- `model = "LM"`  and `random != ""`: `lme4::lmer()`
-- `model = "GLM"` and `random != ""`: `glmmTMB::glmmTMB()`
+- `random = ""`:  `stats::glm()`
+- `random != ""`: `glmmTMB::glmmTMB()`
 
 
 ## When should I use ecoXCorr?
