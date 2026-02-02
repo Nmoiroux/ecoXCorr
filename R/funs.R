@@ -1,0 +1,492 @@
+#' Plot a cross-correlation map (CCM) from lagged regression results
+#'
+#' This function visualises the strength and direction of associations between
+#' a response variable and a lagged predictor across multiple lag windows, using
+#' the output of \code{\link{fit_models_by_lag}}. The resulting plot is a
+#' two-dimensional "cross-correlation map", where each tile represents a
+#' lag window defined by \code{lag_start} and \code{lag_end}.
+#'
+#' The colour of each tile corresponds to a signed coefficient of determination
+#' (\eqn{R^2}), computed as the marginal or classical \eqn{R^2} multiplied by the
+#' sign of the estimated effect. Positive associations are shown in red, negative
+#' associations in blue, and non-significant or filtered values are shown in grey.
+#'
+#' The lag window yielding the maximum \eqn{R^2} is highlighted with a coloured
+#' border.
+#'
+#' @param data A data.frame produced by \code{\link{fit_models_by_lag}}, containing
+#'   at least the columns \code{lag_start}, \code{lag_end}, \code{r2},
+#'   \code{p_value}, and \code{sign}.
+#' @param threshold_p Numeric value giving the p-value threshold above which
+#'   associations are masked (set to \code{NA}) in the plot. Default is \code{1},
+#'   meaning that no filtering is applied.
+#'
+#' @return A \code{ggplot2} object representing the cross-correlation map.
+#'
+#' @details
+#' The x-axis corresponds to \code{lag_start} (displayed in reverse order), and
+#' the y-axis corresponds to \code{lag_end}. Tiles are coloured using a diverging
+#' colour scale centred on zero. Lag windows with \code{p_value >= threshold_p}
+#' are not displayed and appear in grey.
+#'
+#' This function does not perform any modelling itself; it is intended solely
+#' for visualising results obtained from \code{\link{fit_models_by_lag}}.
+#'
+#' @seealso \code{\link{fit_models_by_lag}}, \code{\link[ggplot2]{ggplot}}
+#' @importFrom ggplot2 ggplot aes geom_tile scale_x_reverse scale_fill_gradient2
+#' @export
+plotCCM <- function(data,
+										threshold_p = 1){
+	data$r2sign <- data$sign * data$r2
+	data[data$p_value>=threshold_p,"r2sign"] <- NA
+	minr2 <- min(data$r2sign, na.rm = T)
+	maxr2 <- max(data$r2sign, na.rm = T)
+	maxdata <- subset(data, r2 == max(data$r2))
+	data_pos <- subset(data, sign == 1)
+	data_neg <- subset(data, sign == -1)
+	name_legend <- ifelse(minr2<0,"signed r2","r2")
+
+	plot <- ggplot(data = data, aes(lag_start, lag_end, fill = r2sign)) +
+	  geom_tile() +
+	  geom_tile(data = maxdata , color = "deeppink3", linewidth = 1, show.legend = FALSE)+
+	  scale_x_reverse() +
+	  scale_fill_gradient2(
+			low = "blue",
+			high = "red",
+			mid = "white",
+			midpoint = 0,
+			limit = c(minr2, maxr2),
+			name = name_legend,
+			na.value = "grey"
+		)
+
+	plot
+}
+
+
+
+#' Fit regression models by lag window on aggregated meteorological predictors
+#'
+#' This function fits a regression model separately for each lag window
+#' defined by the \code{lag_start} and \code{lag_end} columns of the input
+#' data frame. For each lag window, the model is fitted using
+#' observations corresponding to different reference dates (\code{date}),
+#' and summary statistics (p-value, sign of effect, R², sample size) are returned
+#' for the specified predictor.
+#'
+#' Both fixed-effect and mixed-effect models are supported.
+#' The modelling function used depends on the combination of \code{model} and
+#' \code{random} arguments:
+#' \itemize{
+#'   \item \code{model = "LM"} and \code{random = ""}: \code{\link[stats]{lm}}
+#'   \item \code{model = "GLM"} and \code{random = ""}: \code{\link[stats]{glm}}
+#'   \item \code{model = "LM"} and \code{random != ""}: \code{\link[lme4]{lmer}}
+#'   \item \code{model = "GLM"} and \code{random != ""}: \code{\link[glmmTMB]{glmmTMB}}
+#' }
+#'
+#' For mixed-effects models, marginal R² (Nakagawa) is returned. For fixed-effects
+#' models, classical R² is used.
+#'
+#' @param data A data frame containing, at minimum, the columns
+#'   \code{lag_start}, \code{lag_end}, \code{date}, the response variable,
+#'   the predictor variable(s) and optional random-effect variables.
+#'
+#' @param response Character string giving the name of the response variable.
+#'
+#' @param predictors Character vector of predictor names. Currently, only
+#'   a single predictor is supported; providing more than one predictor
+#'   will result in an error.
+#'
+#' @param random Optional character string specifying random-effects terms
+#'   to be added to the model formula (without a leading \code{+}), e.g.
+#'   \code{"(1 | site/year)"} or \code{"(1 | site) + (1 | year)"}.
+#'   If empty (default), a fixed-effect model is fitted.
+#'
+#' @param model Character string specifying the model type. Either
+#'   \code{"LM"} for linear models or \code{"GLM"} for generalized linear models.
+#'
+#' @param family A description of the error distribution and link function
+#'   to be used in GLM or GLMM models. Ignored for linear models.
+#'
+#' @param min_n Minimum number of observations required to fit a model.
+#'   (Currently not enforced; retained for future extensions.)
+#'
+#' @param ... Additional arguments passed to the underlying modelling
+#'   function (\code{lm}, \code{glm}, \code{lme4::lmer}, or
+#'   \code{glmmTMB::glmmTMB}).
+#'
+#' @details
+#' For each unique combination of \code{lag_start} and \code{lag_end}, the
+#' function:
+#' \enumerate{
+#'   \item Subsets the data to the corresponding lag window,
+#'   \item Removes rows with missing values in the response or predictor,
+#'   \item Fits the specified model,
+#'   \item Extracts the p-value of the predictor effect,
+#'   \item Computes the model R² (marginal R² for mixed models),
+#'   \item Records the sign of the estimated effect and the sample size.
+#' }
+#'
+#' The returned table is suitable for lag–window screening, heatmap
+#' visualisation, or sensitivity analyses in epidemiological or ecological
+#' studies.
+#'
+#' @return A data frame with one row per lag window, containing:
+#'   \describe{
+#'     \item{lag_start}{Start lag index of the aggregation window.}
+#'     \item{lag_end}{End lag index of the aggregation window.}
+#'     \item{predictor}{Name of the predictor variable.}
+#'     \item{p_value}{P-value associated with the predictor effect.}
+#'     \item{r2}{Coefficient of determination (marginal R² for mixed models).}
+#'     \item{sign}{Sign of the estimated predictor effect (-1 or +1).}
+#'     \item{n}{Number of observations used to fit the model.}
+#'   }
+#'
+#' @seealso
+#' \code{\link[lme4]{lmer}},
+#' \code{\link[glmmTMB]{glmmTMB}},
+#' \code{\link[performance]{r2}},
+#' \code{\link[performance]{r2_nakagawa}}
+#'
+#' @importFrom glmmTMB glmmTMB nbinom2 nbinom1 compois truncated_compois genpois truncated_genpois truncated_poisson
+#' @importFrom glmmTMB truncated_nbinom2 truncated_nbinom1 beta_family betabinomial tweedie lognormal ziGamma t_family ordbeta
+#' @importFrom stats lm glm
+#' @importFrom lme4 lmer
+#' @importFrom performance r2 r2_nakagawa
+#' @export
+fit_models_by_lag <- function(data,
+															response,
+															predictors,
+															random = "", # Random-effects terms to be added to the formulae, wihtout initial "+", e.g. "(a|b/c)+(a|d)"
+															model = c("LM", "GLM"),
+															family = gaussian(),
+															min_n = 10,
+															track = F,
+															...) {
+
+	out <- data
+	model <- match.arg(model)
+
+	# Ensure response exists
+	stopifnot(response %in% names(out))
+	stopifnot(all(predictors %in% names(out)))
+
+	# Bi- or multi-variate model ?
+	if (length(predictors) >1 ){
+		multiv <- TRUE
+		stop("The function does not support multiple predictors")
+	}
+
+	# Unique lag windows
+	lag_windows <- unique(out[, c("lag_start", "lag_end")])
+	n_mod_to_fit <- nrow(lag_windows)
+
+	# mixed-effect model ?
+	if (nchar(random) > 0 ){
+		mixed <- TRUE
+		if (n_mod_to_fit > 30){
+			message(
+				"There are ",	paste0(n_mod_to_fit)," models to be fitted, which may take some time…"
+			)
+		}
+	} else {
+		mixed <- FALSE
+	}
+
+
+	results <- list()
+	k <- 1
+
+	for (i in seq_len(nrow(lag_windows))) {
+
+		ls <- lag_windows$lag_start[i]
+		le <- lag_windows$lag_end[i]
+
+		# Subset data for this lag window
+		dat <- out[out$lag_start == ls &
+							 	out$lag_end   == le, ]
+
+		n <- nrow(dat)
+		#if (n < min_n) next
+
+		# Build formula
+		if (mixed == TRUE) {
+			fml <- as.formula(
+				paste(response, "~", paste(c(predictors,random), collapse = " + ")))
+			fml_null <- as.formula(
+				paste(response, "~", paste(c("1",random), collapse = " + ")))
+		} else {
+			fml <- as.formula(
+				paste(response, "~", paste(predictors, collapse = " + ")))
+		}
+
+		if (track == T){
+			print(lag_windows[i,])
+		}
+
+		# Fit model
+		if (model == "LM" & mixed == T){
+			fit <- lmer(fml, data = dat, ...)
+			fit_null <- lmer(fml_null, data = dat, ...)
+			r2 <- r2_nakagawa(fit, null_model = fit_null)[[2]]
+		} else if (model == "GLM" & mixed == T){
+		  family <-
+			fit <- glmmTMB(fml, data = dat, family = family, ...)
+			fit_null <- glmmTMB(fml_null, data = dat, family = family, ...)
+			r2 <- r2_nakagawa(fit, null_model = fit_null)[[2]]
+		} else if (model == "LM" & mixed == F){
+			fit <- lm(fml, data = dat, ...)
+			r2 <- r2(fit)[[1]]
+		} else if (model == "GLM" & mixed == F){
+			fit <- glm(fml, data = dat, family = family, ...)
+			r2 <- r2(fit)[[1]]
+		}
+
+
+		sm <- summary(fit)
+
+		if (model == "GLM" & mixed == T){
+			pval <- sm$coefficients$cond[predictors[1],4]
+			sign <- sign(sm$coefficients$cond[predictors[1],1])
+		} else {
+			pval <- sm$coefficients[predictors[1],4]
+			sign <- sign(sm$coefficients[predictors[1],1])
+		}
+
+
+
+
+		results[[k]] <- data.frame(
+			lag_start = ls,
+			lag_end   = le,
+			predictor = predictors[1],
+			p_value   = pval,
+			r2        = r2,
+			sign      = sign,
+			n         = n
+		)
+
+		k <- k + 1
+	}
+
+	results <- do.call(rbind, results)
+	rownames(results) <- 1:nrow(results)
+
+	if (mixed == TRUE & n_mod_to_fit > 30){
+		message("Done !")
+	}
+
+
+	return(results)
+
+}
+
+
+
+
+#' Aggregate meteorological time series over multiple lagged time intervals
+#'
+#' This function computes aggregated values of one or several meteorological
+#' time series over all possible lagged time intervals defined relative to one
+#' or more reference dates. For each reference date \code{d}, all intervals
+#' \eqn{[d - k \times i \times u,\; d - (l-1) \times i \times u)} are generated,
+#' where \code{i} is the interval length (in units of \code{lag_unit}), \code{u}
+#' is the time unit in days, and \code{k, l} range from 1 to \code{m} with
+#' \code{k >= l}. Each interval is then used to aggregate the specified
+#' meteorological variables using one or more summary functions.
+#'
+#' The function supports multiple reference dates, multiple variables, and
+#' multiple aggregation functions, and returns all combinations as additional
+#' columns in the output data frame.
+#'
+#' Reference dates for which at least one interval contains no observations are
+#' reported in the console as having missing data. Reference dates for which at
+#' least one interval partially lies outside the temporal bounds of the input
+#' time series are reported as having truncated intervals.
+#'
+#' @param data A data.frame containing the meteorological time series.
+#' @param date_col Character string giving the name of the date column in
+#'   \code{data}. The column must be of class \code{Date} or \code{POSIXct}.
+#' @param value_cols Character vector giving the names of numeric variables
+#'   to be aggregated (e.g. rainfall, temperature).
+#' @param d Vector of reference dates. Can be of class \code{Date} or coercible
+#'   to \code{Date}. Aggregations are computed independently for each date.
+#' @param i Integer giving the length of the base time interval, expressed in
+#'   units of \code{lag_unit}.
+#' @param m Integer giving the maximum lag (number of intervals) to consider.
+#'   All combinations of lag windows with \code{1 <= lag_end <= lag_start <= m}
+#'   are evaluated.
+#' @param lag_unit Integer giving the duration of the time unit in days
+#'   (e.g. \code{1} for daily data, \code{7} for weekly intervals,
+#'   \code{14} for fortnightly intervals).
+#' @param funs Named list of aggregation functions to apply to each variable.
+#'   Each function must accept a numeric vector as first argument. The names
+#'   of the list are used to construct output column names
+#'   (e.g. \code{rain_mean}, \code{temp_max}). Defaults to mean, min, max and sum.
+#' @param na.rm Logical indicating whether missing values should be removed
+#'   before aggregation. Passed to the aggregation functions (default: \code{TRUE}).
+#'
+#' @return A data.frame with one row per reference date and lag window, containing:
+#'   \itemize{
+#'     \item \code{date}: reference date
+#'     \item \code{start}, \code{end}: start (inclusive) and end (exclusive) of
+#'       the aggregation interval
+#'     \item \code{lag_start}, \code{lag_end}: lag indices defining the interval
+#'     \item One column per combination of variable and aggregation function
+#'       (e.g. \code{rain_mean}, \code{temperature_sum})
+#'   }
+#'
+#' @details
+#' Intervals are defined as left-closed and right-open
+#' (\code{[start, end)}). An interval is considered truncated if it extends
+#' beyond the temporal bounds of the input time series. An interval is considered
+#' missing if no observations fall within it.
+#'
+#' Console messages are printed to inform the user of reference dates for which
+#' missing data or truncated intervals occurred.
+#'
+#' @export
+aggregate_lagged_intervals <- function(data,date_col,value_cols,d,i,m,
+																			 lag_unit = 1, # integer, in days (7 for weekly intervals, 14 for fortnight, 30 for months...)
+																			 funs = list(mean = mean,
+																			 						min = min,
+																			 						max  = max,
+																			 						sum  = sum),
+																			 na.rm = TRUE) {
+
+
+	# Sanity checks
+
+	stopifnot(inherits(data[[date_col]], c("Date", "POSIXct")))
+	stopifnot(all(value_cols %in% names(data)))
+	stopifnot(all(sapply(data[value_cols], is.numeric)))
+	stopifnot(is.list(funs), !is.null(names(funs)))
+	stopifnot(m >= 1, i >= 1)
+	stopifnot(lag_unit == as.integer(lag_unit)) # check if its an integer
+
+	d <- as.Date(d)
+
+
+	# Time unit handling
+
+	step <- i * lag_unit
+
+	# Time series limits
+	ts_min <- min(as.Date(data[[date_col]]), na.rm = TRUE)
+	ts_max <- max(as.Date(data[[date_col]]), na.rm = TRUE)
+
+	# Containers
+	results <- list()
+	missing_dates   <- as.Date(character(0))
+	truncated_dates <- as.Date(character(0))
+
+
+	# Loop over reference dates
+
+	for (dd in d) {
+
+		intervals <- list()
+		k <- 1
+
+		for (end_lag in 1:m) {
+			end_date <- dd - (end_lag - 1) * step
+
+			for (start_lag in end_lag:m) {
+				start_date <- dd - start_lag * step
+
+				intervals[[k]] <- data.frame(
+					date     = dd,
+					start     = start_date,
+					end       = end_date,
+					lag_start = start_lag,
+					lag_end   = end_lag,
+					stringsAsFactors = FALSE
+				)
+				k <- k + 1
+			}
+		}
+
+		intervals <- do.call(rbind, intervals)
+
+		has_missing   <- FALSE
+		has_truncated <- FALSE
+
+
+		# Aggregation
+
+		agg_list <- lapply(seq_len(nrow(intervals)), function(j) {
+
+			# Check if interval exceeds time series bounds
+			if (intervals$start[j] < ts_min || intervals$end[j] > ts_max) {
+				has_truncated <<- TRUE
+			}
+
+			idx <- data[[date_col]] >= intervals$start[j] &
+				data[[date_col]] <  intervals$end[j]
+
+			out <- c()
+
+			for (v in value_cols) {
+
+				x <- data[[v]][idx]
+
+				if (length(x) == 0) {
+					has_missing <<- TRUE
+					vals <- rep(NA_real_, length(funs))
+				} else {
+					vals <- sapply(funs, function(f)
+						do.call(f, list(x, na.rm = na.rm))
+					)
+				}
+
+				names(vals) <- paste(v, names(funs), sep = "_")
+				out <- c(out, vals)
+			}
+
+			out
+		})
+
+		agg_df <- as.data.frame(do.call(rbind, agg_list))
+		rownames(agg_df) <- NULL
+
+		results[[length(results) + 1]] <- cbind(intervals, agg_df)
+
+		if (has_missing) {
+			missing_dates <- c(missing_dates, dd)
+		}
+
+		if (has_truncated) {
+			truncated_dates <- c(truncated_dates, dd)
+		}
+	}
+
+
+	# Final assembly
+
+	out <- do.call(rbind, results)
+
+	out$date <- as.Date(out$date, origin = "1970-01-01")
+	out$start <- as.Date(out$start, origin = "1970-01-01")
+	out$end   <- as.Date(out$end,   origin = "1970-01-01")
+
+
+	# Console messages
+
+	if (length(missing_dates) > 0) {
+		message(
+			"Missing data: at least one interval contained no observations for reference date(s): ",
+			paste(format(unique(missing_dates)), collapse = ", ")
+		)
+	}
+
+	if (length(truncated_dates) > 0) {
+		message(
+			"Truncated intervals: some statistics computed on partial intervals (outside time series bounds) for reference date(s): ",
+			paste(format(unique(truncated_dates)), collapse = ", ")
+		)
+	}
+
+	out
+}
+
+
