@@ -140,22 +140,26 @@ res_glmm <- fit_models_by_lag(
 )
 ```
 
-## R Markdown
+## When should I use ecoXCorr?
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+ecoXCorr is useful when:
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+- environmental drivers are expected to have delayed effects
+- the relevant time scale of these effects is unknown
+- you want a global view of lagged associations rather than testing a single lag
 
-```{r cars}
-summary(cars)
-```
+Typical applications include:
 
-## Including Plots
+- vector ecology
+- disease ecology
+- environmental epidemiology
+- climate–biology interactions
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+### References 
+This package builds upon : 
+- Curriero FC, Shone SM, Glass GE. (2005) *Cross correlation maps: a tool for visualizing and modeling time lagged associations.* [Vector Borne Zoonotic Dis.](https://doi.org/10.1089/vbz.2005.5.267)
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+### License 
+This package is released under the [GPL-3 License](https://www.gnu.org/licenses/gpl-3.0-standalone.html). 
