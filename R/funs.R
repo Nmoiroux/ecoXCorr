@@ -37,6 +37,7 @@
 #' @export
 plotCCM <- function(data,
 										threshold_p = 1){
+
 	data$r2sign <- data$sign * data$r2
 	data[data$p_value>=threshold_p,"r2sign"] <- NA
 	minr2 <- min(data$r2sign, na.rm = T)
@@ -71,7 +72,7 @@ plotCCM <- function(data,
 #' defined by the \code{lag_start} and \code{lag_end} columns of the input
 #' data frame. For each lag window, the model is fitted using
 #' observations corresponding to different reference dates (\code{date}),
-#' and summary statistics (p-value, sign of effect, R², sample size) are returned
+#' and summary statistics (p-value, sign of effect, R^2, sample size) are returned
 #' for the specified predictor.
 #'
 #' Both fixed-effect and mixed-effect models are supported.
@@ -84,8 +85,8 @@ plotCCM <- function(data,
 #'   \item \code{model = "GLM"} and \code{random != ""}: \code{\link[glmmTMB]{glmmTMB}}
 #' }
 #'
-#' For mixed-effects models, marginal R² (Nakagawa) is returned. For fixed-effects
-#' models, classical R² is used.
+#' For mixed-effects models, marginal R^2 (Nakagawa) is returned. For fixed-effects
+#' models, classical R^2 is used.
 #'
 #' @param data A data frame containing, at minimum, the columns
 #'   \code{lag_start}, \code{lag_end}, \code{date}, the response variable,
@@ -111,6 +112,8 @@ plotCCM <- function(data,
 #' @param min_n Minimum number of observations required to fit a model.
 #'   (Currently not enforced; retained for future extensions.)
 #'
+#' @param track If TRUE, lag window is printed in the console before model fitting.
+#'
 #' @param ... Additional arguments passed to the underlying modelling
 #'   function (\code{lm}, \code{glm}, \code{lme4::lmer}, or
 #'   \code{glmmTMB::glmmTMB}).
@@ -123,11 +126,11 @@ plotCCM <- function(data,
 #'   \item Removes rows with missing values in the response or predictor,
 #'   \item Fits the specified model,
 #'   \item Extracts the p-value of the predictor effect,
-#'   \item Computes the model R² (marginal R² for mixed models),
+#'   \item Computes the model R^2 (marginal R^2 for mixed models),
 #'   \item Records the sign of the estimated effect and the sample size.
 #' }
 #'
-#' The returned table is suitable for lag–window screening, heatmap
+#' The returned table is suitable for lag-window screening, heatmap
 #' visualisation, or sensitivity analyses in epidemiological or ecological
 #' studies.
 #'
@@ -137,9 +140,9 @@ plotCCM <- function(data,
 #'     \item{lag_end}{End lag index of the aggregation window.}
 #'     \item{predictor}{Name of the predictor variable.}
 #'     \item{p_value}{P-value associated with the predictor effect.}
-#'     \item{r2}{Coefficient of determination (marginal R² for mixed models).}
+#'     \item{r2}{Coefficient of determination (marginal R^2 for mixed models).}
 #'     \item{sign}{Sign of the estimated predictor effect (-1 or +1).}
-#'     \item{n}{Number of observations used to fit the model.}
+#'     \item{min_n}{Number of observations used to fit the model.}
 #'   }
 #'
 #' @seealso
@@ -150,7 +153,7 @@ plotCCM <- function(data,
 #'
 #' @importFrom glmmTMB glmmTMB nbinom2 nbinom1 compois truncated_compois genpois truncated_genpois truncated_poisson
 #' @importFrom glmmTMB truncated_nbinom2 truncated_nbinom1 beta_family betabinomial tweedie lognormal ziGamma t_family ordbeta
-#' @importFrom stats lm glm
+#' @importFrom stats lm glm as.formula gaussian binomial Gamma inverse.gaussian poisson quasi quasibinomial quasipoisson
 #' @importFrom lme4 lmer
 #' @importFrom performance r2 r2_nakagawa
 #' @export
@@ -186,7 +189,7 @@ fit_models_by_lag <- function(data,
 		mixed <- TRUE
 		if (n_mod_to_fit > 30){
 			message(
-				"There are ",	paste0(n_mod_to_fit)," models to be fitted, which may take some time…"
+				"There are ",	paste0(n_mod_to_fit)," models to be fitted, which may take some time..."
 			)
 		}
 	} else {
@@ -289,9 +292,8 @@ fit_models_by_lag <- function(data,
 #' This function computes aggregated values of one or several meteorological
 #' time series over all possible lagged time intervals defined relative to one
 #' or more reference dates. For each reference date \code{d}, all intervals
-#' \eqn{[d - k \times i \times u,\; d - (l-1) \times i \times u)} are generated,
-#' where \code{i} is the interval length (in units of \code{lag_unit}), \code{u}
-#' is the time unit in days, and \code{k, l} range from 1 to \code{m} with
+#' \eqn{[d - k \times i,\; d - (l-1) \times i)} are generated,
+#' where \code{i} is the interval length (in days) and \code{k, l} range from 1 to \code{m} with
 #' \code{k >= l}. Each interval is then used to aggregate the specified
 #' meteorological variables using one or more summary functions.
 #'
@@ -309,16 +311,14 @@ fit_models_by_lag <- function(data,
 #'   \code{data}. The column must be of class \code{Date} or \code{POSIXct}.
 #' @param value_cols Character vector giving the names of numeric variables
 #'   to be aggregated (e.g. rainfall, temperature).
-#' @param d Vector of reference dates. Can be of class \code{Date} or coercible
+#' @param d Vector of reference *dates*. Can be of class \code{Date} or coercible
 #'   to \code{Date}. Aggregations are computed independently for each date.
-#' @param i Integer giving the length of the base time interval, expressed in
-#'   units of \code{lag_unit}.
-#' @param m Integer giving the maximum lag (number of intervals) to consider.
-#'   All combinations of lag windows with \code{1 <= lag_end <= lag_start <= m}
-#'   are evaluated.
-#' @param lag_unit Integer giving the duration of the time unit in days
+#' @param i Integer giving the length of the base time *interval*, expressed in days
 #'   (e.g. \code{1} for daily data, \code{7} for weekly intervals,
 #'   \code{14} for fortnightly intervals).
+#' @param m Integer giving the *maximum* lag (number of intervals) to consider.
+#'   All combinations of lag windows with \code{1 <= lag_end <= lag_start <= m}
+#'   are evaluated.
 #' @param funs Named list of aggregation functions to apply to each variable.
 #'   Each function must accept a numeric vector as first argument. The names
 #'   of the list are used to construct output column names
@@ -346,8 +346,9 @@ fit_models_by_lag <- function(data,
 #' missing data or truncated intervals occurred.
 #'
 #' @export
-aggregate_lagged_intervals <- function(data,date_col,value_cols,d,i,m,
-																			 lag_unit = 1, # integer, in days (7 for weekly intervals, 14 for fortnight, 30 for months...)
+aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
+																			 i = 1, # integer, in days (7 for weekly intervals, 14 for fortnight, 30 for months...)
+																			 m,
 																			 funs = list(mean = mean,
 																			 						min = min,
 																			 						max  = max,
@@ -362,14 +363,14 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,i,m,
 	stopifnot(all(sapply(data[value_cols], is.numeric)))
 	stopifnot(is.list(funs), !is.null(names(funs)))
 	stopifnot(m >= 1, i >= 1)
-	stopifnot(lag_unit == as.integer(lag_unit)) # check if its an integer
+	stopifnot(i == as.integer(i)) # check if its an integer
 
 	d <- as.Date(d)
 
 
 	# Time unit handling
 
-	step <- i * lag_unit
+	step <- i
 
 	# Time series limits
 	ts_min <- min(as.Date(data[[date_col]]), na.rm = TRUE)

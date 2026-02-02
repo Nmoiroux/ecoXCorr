@@ -11,19 +11,15 @@ Authors@R: c(
     person(given = "Colombine", 
            family = "Bartholomée", 
            email = "colombine.bartholomee@ird.fr", 
-           role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0001-7291-5195"))
+           role = c("aut"),
+           comment = c(ORCID = "0000-0001-7291-5195")),
     person(given = "Paul", 
            family = "Taconet", 
            email = "paul.taconet@ird.fr", 
-           role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0001-7429-7204")),
+           role = c("aut"),
+           comment = c(ORCID = "0000-0001-7429-7204"))
   )
-Description: Tools for analysing lagged relationships between environmental variables and ecological 
-or epidemiological time series. The package implements a workflow to aggregate meteorological data 
-over multiple lagged intervals, fit regression models for each lag window, and visualise effect strength 
-and direction using cross-correlation maps (CCM).
-
+Description: Tools for analysing lagged relationships between environmental variables and ecological or epidemiological time series. The package implements a workflow to aggregate meteorological data over multiple lagged intervals, fit regression models for each lag window, and visualise effect strength and direction using cross-correlation maps (CCM).
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true

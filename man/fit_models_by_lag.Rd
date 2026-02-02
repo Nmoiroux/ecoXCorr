@@ -41,6 +41,8 @@ to be used in GLM or GLMM models. Ignored for linear models.}
 \item{min_n}{Minimum number of observations required to fit a model.
 (Currently not enforced; retained for future extensions.)}
 
+\item{track}{If TRUE, lag window is printed in the console before model fitting.}
+
 \item{...}{Additional arguments passed to the underlying modelling
 function (\code{lm}, \code{glm}, \code{lme4::lmer}, or
 \code{glmmTMB::glmmTMB}).}
@@ -52,9 +54,9 @@ A data frame with one row per lag window, containing:
     \item{lag_end}{End lag index of the aggregation window.}
     \item{predictor}{Name of the predictor variable.}
     \item{p_value}{P-value associated with the predictor effect.}
-    \item{r2}{Coefficient of determination (marginal R² for mixed models).}
+    \item{r2}{Coefficient of determination (marginal R^2 for mixed models).}
     \item{sign}{Sign of the estimated predictor effect (-1 or +1).}
-    \item{n}{Number of observations used to fit the model.}
+    \item{min_n}{Number of observations used to fit the model.}
   }
 }
 \description{
@@ -62,7 +64,7 @@ This function fits a regression model separately for each lag window
 defined by the \code{lag_start} and \code{lag_end} columns of the input
 data frame. For each lag window, the model is fitted using
 observations corresponding to different reference dates (\code{date}),
-and summary statistics (p-value, sign of effect, R², sample size) are returned
+and summary statistics (p-value, sign of effect, R^2, sample size) are returned
 for the specified predictor.
 }
 \details{
@@ -76,8 +78,8 @@ The modelling function used depends on the combination of \code{model} and
   \item \code{model = "GLM"} and \code{random != ""}: \code{\link[glmmTMB]{glmmTMB}}
 }
 
-For mixed-effects models, marginal R² (Nakagawa) is returned. For fixed-effects
-models, classical R² is used.
+For mixed-effects models, marginal R^2 (Nakagawa) is returned. For fixed-effects
+models, classical R^2 is used.
 
 
 For each unique combination of \code{lag_start} and \code{lag_end}, the
@@ -87,11 +89,11 @@ function:
   \item Removes rows with missing values in the response or predictor,
   \item Fits the specified model,
   \item Extracts the p-value of the predictor effect,
-  \item Computes the model R² (marginal R² for mixed models),
+  \item Computes the model R^2 (marginal R^2 for mixed models),
   \item Records the sign of the estimated effect and the sample size.
 }
 
-The returned table is suitable for lag–window screening, heatmap
+The returned table is suitable for lag-window screening, heatmap
 visualisation, or sensitivity analyses in epidemiological or ecological
 studies.
 }

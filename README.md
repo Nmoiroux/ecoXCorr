@@ -6,7 +6,7 @@ It provides a coherent workflow to:
 
 1. Aggregate environmental variables over multiple lagged time windows  
 2. Fit regression models across all lag structures  
-3. Visualise effect strength and direction using **cross-correlation maps**
+3. Visualise effect strength and direction using **cross-correlation maps** (CCM)
 
 The package is particularly suited for studying **delayed environmental effects**, such as the influence of meteorological conditions on insect abundance or disease dynamics.
 
@@ -61,25 +61,32 @@ Meteorological variables are aggregated over all possible lag windows defined by
 - a reference date (`d`),  
 - a base interval length (`i`),
 - a maximum lag (`m`)
-- a time unit in days (`lag_unit`)
 
-For each reference date \code{d}, all intervals \eqn{[d - k \times i \times u,\; d - (l-1) \times i \times u)} are generated,
-where \code{i} is the interval length (in units of \code{lag_unit}), \code{u} is the time unit in days, and \code{k, l} range from 1 to \code{m} with
-\code{k >= l}.
+For each reference date `d`, all intervals $[d - k \times i,\; d - (l-1) \times i)]$ are generated,
+where `i` is the interval length (in days) and `k, l` range from 1 to `m` with `k >= l`.
+
+
+In the example below `i` is set to 7 days, indicting that the unit for time intervals and lags will be a week.
+`m` is set to 8, indicating that the maximum lag (between response and predictor variables) considered will be
+8 weeks (or $m \times i$ days)
 
 ```r
+?aggregate_lagged_intervals
+
+# get sampling days from our entomological dataset
 sampling_dates <- unique(albopictusMPL2023$date)
 
+# perform data aggregation for cumulated rainfalls and mean daily temperatures
 met_agg <- aggregate_lagged_intervals(
   data       = meteoMPL2023,
   date_col   = "date",
   value_cols = c("rain_sum", "temp_mean"),
   d          = sampling_dates,
-  i          = 1,
-  m          = 8,
-  lag_unit   = 7   # weekly intervals
+  i          = 7,               
+  m          = 8
 )
 
+head(met_agg)
 ```
 
 ### Join environmental and response data
@@ -101,6 +108,8 @@ Simple GLM example
 Here, a Poisson GLM is fitted independently for each lag window:
 
 ```r
+?fit_models_by_lag
+
 res_glm <- fit_models_by_lag(
   data       = data,
   response   = "individualCount",
@@ -123,7 +132,7 @@ Each tile represents a lag window, with colour indicating the signed R²
 
 ### Mixed-effects model example
 
-Because mosquito counts are zero-truncated and observations are not independent
+Because mosquito counts in the `albopictusMPL2023` dataset are zero-truncated and observations are not independent
 (repeated measurements, spatial structure), a mixed-effects model may be more appropriate.
 This example illustrates how ecoXCorr supports such models:
 
@@ -138,7 +147,17 @@ res_glmm <- fit_models_by_lag(
   random     = "(1|area/trap)",
   family     = truncated_nbinom2(link = "log")
 )
+
+plotCCM(res_glmm, threshold_p = 0.2)
 ```
+
+The modelling function used depends on the combination of `model` and `random` arguments:
+
+- `model = "LM"`  and `random = ""`:  `stats::lm()`
+- `model = "GLM"` and `random = ""`:  `stats::glm()`
+- `model = "LM"`  and `random != ""`: `lme4::lmer()`
+- `model = "GLM"` and `random != ""`: `glmmTMB::glmmTMB()`
+
 
 ## When should I use ecoXCorr?
 
@@ -158,6 +177,7 @@ Typical applications include:
 
 ### References 
 This package builds upon : 
+
 - Curriero FC, Shone SM, Glass GE. (2005) *Cross correlation maps: a tool for visualizing and modeling time lagged associations.* [Vector Borne Zoonotic Dis.](https://doi.org/10.1089/vbz.2005.5.267)
 
 

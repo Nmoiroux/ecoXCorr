@@ -9,9 +9,8 @@ aggregate_lagged_intervals(
   date_col,
   value_cols,
   d,
-  i,
+  i = 1,
   m,
-  lag_unit = 1,
   funs = list(mean = mean, min = min, max = max, sum = sum),
   na.rm = TRUE
 )
@@ -25,19 +24,16 @@ aggregate_lagged_intervals(
 \item{value_cols}{Character vector giving the names of numeric variables
 to be aggregated (e.g. rainfall, temperature).}
 
-\item{d}{Vector of reference dates. Can be of class \code{Date} or coercible
+\item{d}{Vector of reference *dates*. Can be of class \code{Date} or coercible
 to \code{Date}. Aggregations are computed independently for each date.}
 
-\item{i}{Integer giving the length of the base time interval, expressed in
-units of \code{lag_unit}.}
-
-\item{m}{Integer giving the maximum lag (number of intervals) to consider.
-All combinations of lag windows with \code{1 <= lag_end <= lag_start <= m}
-are evaluated.}
-
-\item{lag_unit}{Integer giving the duration of the time unit in days
+\item{i}{Integer giving the length of the base time *interval*, expressed in days
 (e.g. \code{1} for daily data, \code{7} for weekly intervals,
 \code{14} for fortnightly intervals).}
+
+\item{m}{Integer giving the *maximum* lag (number of intervals) to consider.
+All combinations of lag windows with \code{1 <= lag_end <= lag_start <= m}
+are evaluated.}
 
 \item{funs}{Named list of aggregation functions to apply to each variable.
 Each function must accept a numeric vector as first argument. The names
@@ -62,9 +58,8 @@ A data.frame with one row per reference date and lag window, containing:
 This function computes aggregated values of one or several meteorological
 time series over all possible lagged time intervals defined relative to one
 or more reference dates. For each reference date \code{d}, all intervals
-\eqn{[d - k \times i \times u,\; d - (l-1) \times i \times u)} are generated,
-where \code{i} is the interval length (in units of \code{lag_unit}), \code{u}
-is the time unit in days, and \code{k, l} range from 1 to \code{m} with
+\eqn{[d - k \times i,\; d - (l-1) \times i)} are generated,
+where \code{i} is the interval length (in days) and \code{k, l} range from 1 to \code{m} with
 \code{k >= l}. Each interval is then used to aggregate the specified
 meteorological variables using one or more summary functions.
 }
