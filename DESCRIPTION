@@ -1,16 +1,38 @@
 Package: ecoXCorr
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Lagged Cross-Correlation Analysis of Environmental Time Series
 Version: 0.1.0
 Authors@R: c(
-    person(
-      "Jane", "Doe",
-      email = "jane@example.com",
-      role = c("aut", "cre")
-    )
+    person(given = "Nicolas", 
+           family = "Moiroux", 
+           email = "nicolas.moiroux@ird.fr", 
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-6755-6167")),
+    person(given = "Colombine", 
+           family = "Bartholomée", 
+           email = "colombine.bartholomee@ird.fr", 
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-7291-5195"))
+    person(given = "Paul", 
+           family = "Taconet", 
+           email = "paul.taconet@ird.fr", 
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-7429-7204")),
   )
-Description: More about what it does (maybe more than one line).
-    Continuation lines should be indented.
-License: What license is it under?
+Description: Tools for analysing lagged relationships between environmental variables and ecological 
+or epidemiological time series. The package implements a workflow to aggregate meteorological data 
+over multiple lagged intervals, fit regression models for each lag window, and visualise effect strength 
+and direction using cross-correlation maps (CCM).
+
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 7.3.3
+Imports: 
+    glmmTMB,
+    lme4,
+    ggplot2,
+    stats,
+    performance
+Depends: 
+    R (>= 3.5)
