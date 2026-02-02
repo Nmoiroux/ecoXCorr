@@ -151,8 +151,7 @@ plotCCM <- function(data,
 #' \code{\link[performance]{r2}},
 #' \code{\link[performance]{r2_nakagawa}}
 #'
-#' @importFrom glmmTMB glmmTMB nbinom2 nbinom1 compois truncated_compois genpois truncated_genpois truncated_poisson
-#' @importFrom glmmTMB truncated_nbinom2 truncated_nbinom1 beta_family betabinomial tweedie lognormal ziGamma t_family ordbeta
+#' @importFrom glmmTMB glmmTMB nbinom2 nbinom1 compois truncated_compois genpois truncated_genpois truncated_poisson truncated_nbinom2 truncated_nbinom1 beta_family betabinomial tweedie lognormal ziGamma t_family ordbeta
 #' @importFrom stats lm glm as.formula gaussian binomial Gamma inverse.gaussian poisson quasi quasibinomial quasipoisson
 #' @importFrom lme4 lmer
 #' @importFrom performance r2 r2_nakagawa
@@ -233,7 +232,6 @@ fit_models_by_lag <- function(data,
 			fit_null <- lmer(fml_null, data = dat, ...)
 			r2 <- r2_nakagawa(fit, null_model = fit_null)[[2]]
 		} else if (model == "GLM" & mixed == T){
-		  family <-
 			fit <- glmmTMB(fml, data = dat, family = family, ...)
 			fit_null <- glmmTMB(fml_null, data = dat, family = family, ...)
 			r2 <- r2_nakagawa(fit, null_model = fit_null)[[2]]

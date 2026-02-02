@@ -43,6 +43,7 @@ The package ships with two example datasets to illustrate this workflow:
 Load required packages and example data
 ```r
 library(ecoXCorr)
+library(dplyr)
 
 # Meteorological daily time series
 ?meteoMPL2023
@@ -94,12 +95,8 @@ head(met_agg)
 Each reference date is associated with multiple lag windows, resulting in a many-to-many join:
 
 ```r
-data <- full_join(
-  met_agg,
-  albopictusMPL2023,
-  by = "date",
-  relationship = "many-to-many"
-)
+data <- merge(met_agg,
+              albopictusMPL2023, by = "date", all = TRUE)
 
 ```
 ### Fit models across lag windows
