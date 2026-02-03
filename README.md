@@ -1,6 +1,6 @@
 # ecoXCorr
 
-**ecoXCorr** is an R package designed to explore **lagged associations between environmental time series and ecological or epidemiological responses**.  
+**ecoXCorr** ("Eco-Cross-Corr") is an R package designed to explore **lagged associations between environmental time series and ecological or epidemiological responses**.  
 
 It provides a coherent workflow to:
 
@@ -9,6 +9,9 @@ It provides a coherent workflow to:
 3. Visualise effect strength and direction using **cross-correlation maps** (CCM)
 
 The package is particularly suited for studying **delayed environmental effects**, such as the influence of meteorological conditions on insect abundance or disease dynamics.
+
+**ecoXCorr** has less features than amazing **climwin** package. However, because **ecoXCorr** use glmmTMB, it can fit models according to a large variety of error distribution (including negative-binomial, zero-inflated, zero-truncated...).
+**ecoXCorr** is also more flexible for interval lengths that are specified in number of days and not limited to "week" or "month". 
 
 ---
 
@@ -22,16 +25,16 @@ devtools::install_github("Nmoiroux/ecoXCorr")
 
 ## Overview of the workflow
 
-The typical workflow in **ecoXCorr** follows three steps:
+The typical workflow in **ecoXCorr** follows three steps with respective functions:
 
 1. **Lagged aggregation of environmental data**  
-   (`aggregate_lagged_intervals()`)
+   `aggregate_lagged_intervals()`
 
 2. **Model fitting across lag windows**  
-   (`fit_models_by_lag()`)
+   `fit_models_by_lag()`
 
 3. **Visualisation using cross-correlation maps**  
-   (`plotCCM()`)
+   `plotCCM()`
 
 The package ships with two example datasets to illustrate this workflow:
 
@@ -43,7 +46,6 @@ The package ships with two example datasets to illustrate this workflow:
 Load required packages and example data
 ```r
 library(ecoXCorr)
-library(dplyr)
 
 # Meteorological daily time series
 ?meteoMPL2023
@@ -112,7 +114,7 @@ res_glm <- fit_models_by_lag(
   response   = "individualCount",
   predictors = "temp_mean_mean",
   family     = "poisson")
-)
+
 ```
 
 ### Visualise results as a cross-correlation map
@@ -123,7 +125,7 @@ res_glm <- fit_models_by_lag(
 plotCCM(res_glm, threshold_p = 0.2)
 ```
 Each tile represents a lag window, with colour indicating the signed R²
-(effect strength × direction). Non-significant associations (p>0.2) are masked.
+(% of variance explained × direction). Non-significant associations (p>0.2) are masked.
 
 
 ### Mixed-effects model example
@@ -141,7 +143,6 @@ res_glmm <- fit_models_by_lag(
   predictors = "temp_mean_mean",
   random     = "(1|area/trap)",
   family     = "truncated_nbinom2")
-)
 
 plotCCM(res_glmm, threshold_p = 0.2)
 ```
@@ -169,9 +170,9 @@ Typical applications include:
 
 
 ### References 
-This package builds upon : 
 
-- Curriero FC, Shone SM, Glass GE. (2005) *Cross correlation maps: a tool for visualizing and modeling time lagged associations.* [Vector Borne Zoonotic Dis.](https://doi.org/10.1089/vbz.2005.5.267)
+- Curriero FC, Shone SM, Glass GE. (2005) Cross correlation maps: a tool for visualizing and modeling time lagged associations. *Vector Borne Zoonotic Dis.* [doi:10.1089/vbz.2005.5.267](https://doi.org/10.1089/vbz.2005.5.267)
+- van de Pol M, Bailey LD, McLean N, et al. (2016) Identifying the best climatic predictors in ecology and evolution. *Methods in Ecology and Evolution.* [doi:10.1111/2041-210X.12590](https://doi.org/10.1111/2041-210X.12590)
 
 
 ### License 

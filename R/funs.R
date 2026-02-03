@@ -59,7 +59,8 @@ plotCCM <- function(data,
 			limit = c(minr2, maxr2),
 			name = name_legend,
 			na.value = "grey"
-		)
+		) +
+	  theme_bw()
 
 	plot
 }
@@ -72,7 +73,7 @@ plotCCM <- function(data,
 #' defined by the \code{lag_start} and \code{lag_end} columns of the input
 #' data frame. For each lag window, the model is fitted using
 #' observations corresponding to different reference dates (\code{date}),
-#' and summary statistics (p-value, sign of effect, R^2, sample size) are returned
+#' and summary statistics (p-value, sign of effect, R^2, AIC reduction, sample size) are returned
 #' for the specified predictor.
 #'
 #' Both fixed-effect and mixed-effect models are supported.
@@ -136,7 +137,8 @@ plotCCM <- function(data,
 #'     \item{p_value}{P-value associated with the predictor effect.}
 #'     \item{r2}{Coefficient of determination (marginal R^2 for mixed models).}
 #'     \item{sign}{Sign of the estimated predictor effect (-1 or +1).}
-#'     \item{min_n}{Number of observations used to fit the model.}
+#'     \item{d_aic}{AIC reduction compared to the null model.}
+#'     \item{n}{Number of observations used to fit the model.}
 #'   }
 #'
 #' @seealso
@@ -197,6 +199,7 @@ fit_models_by_lag <- function(data,
 
 		n <- nrow(dat)
 		#if (n < min_n) next
+		if (var(dat[,predictors[1]])==0) next # will lead to singularities so next
 
 		# Build formula
 		if (mixed == TRUE) {
@@ -207,6 +210,8 @@ fit_models_by_lag <- function(data,
 		} else {
 			fml <- as.formula(
 				paste(response, "~", paste(predictors, collapse = " + ")))
+			fml_null <- as.formula(
+			  paste(response, "~ 1"))
 		}
 
 		if (track == T){
@@ -223,12 +228,16 @@ fit_models_by_lag <- function(data,
 			sign <- sign(sm$coefficients$cond[predictors[1],1])
 		} else {
 			fit <- glm(fml, data = dat, family = family, ...)
+			fit_null <- glm(fml_null, data = dat, family = family, ...)
 			r2 <- r2(fit)[[1]]
 			sm <- summary(fit)
 			pval <- sm$coefficients[predictors[1],4]
 			sign <- sign(sm$coefficients[predictors[1],1])
 		}
 
+		aic <- AIC(fit)
+		aic_null <- AIC(fit_null)
+		d_aic <- aic - aic_null
 
 		results[[k]] <- data.frame(
 			lag_start = ls,
@@ -237,6 +246,7 @@ fit_models_by_lag <- function(data,
 			p_value   = pval,
 			r2        = r2,
 			sign      = sign,
+			d_aic     = d_aic,
 			n         = n
 		)
 
