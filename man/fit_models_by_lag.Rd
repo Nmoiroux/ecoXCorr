@@ -52,7 +52,8 @@ A data frame with one row per lag window, containing:
     \item{p_value}{P-value associated with the predictor effect.}
     \item{r2}{Coefficient of determination (marginal R^2 for mixed models).}
     \item{sign}{Sign of the estimated predictor effect (-1 or +1).}
-    \item{min_n}{Number of observations used to fit the model.}
+    \item{d_aic}{AIC reduction compared to the null model.}
+    \item{n}{Number of observations used to fit the model.}
   }
 }
 \description{
@@ -60,7 +61,7 @@ This function fits a regression model separately for each lag window
 defined by the \code{lag_start} and \code{lag_end} columns of the input
 data frame. For each lag window, the model is fitted using
 observations corresponding to different reference dates (\code{date}),
-and summary statistics (p-value, sign of effect, R^2, sample size) are returned
+and summary statistics (p-value, sign of effect, R^2, AIC reduction, sample size) are returned
 for the specified predictor.
 }
 \details{
