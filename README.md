@@ -11,7 +11,7 @@ It provides a coherent workflow to:
 The package is particularly suited for studying **delayed environmental effects**, such as the influence of meteorological conditions on insect abundance or disease dynamics.
 
 **ecoXCorr** has less features than amazing **climwin** package. However, because **ecoXCorr** use glmmTMB, it can fit models according to a large variety of error distribution (including negative-binomial, zero-inflated, zero-truncated...).
-**ecoXCorr** is also more flexible for interval lengths that are specified in number of days and not limited to "week" or "month". 
+**ecoXCorr** is also more flexible for interval lengths of more than one day. It is not restricted to standard time periods such as "week" and "month". 
 
 ---
 
