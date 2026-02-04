@@ -30,6 +30,7 @@
 #' @importFrom glmmTMB ziGamma
 #' @importFrom performance r2
 #' @importFrom performance r2_nakagawa
+#' @importFrom stats AIC
 #' @importFrom stats as.formula
 #' @importFrom stats binomial
 #' @importFrom stats Gamma
@@ -40,5 +41,6 @@
 #' @importFrom stats quasi
 #' @importFrom stats quasibinomial
 #' @importFrom stats quasipoisson
+#' @importFrom stats var
 ## usethis namespace: end
 NULL

@@ -8,6 +8,14 @@
 \description{
 Tools for analysing lagged relationships between environmental variables and ecological or epidemiological time series. The package implements a workflow to aggregate meteorological data over multiple lagged intervals, fit regression models for each lag window, and visualise effect strength and direction using cross-correlation maps (CCM).
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/Nmoiroux/ecoXCorr}
+  \item Report bugs at \url{https://github.com/Nmoiroux/ecoXCorr/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Nicolas Moiroux \email{nicolas.moiroux@ird.fr} (\href{https://orcid.org/0000-0001-6755-6167}{ORCID})
 
