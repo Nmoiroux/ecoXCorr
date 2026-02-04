@@ -50,7 +50,8 @@ A data frame with one row per lag window, containing:
     \item{lag_end}{End lag index of the aggregation window.}
     \item{predictor}{Name of the predictor variable.}
     \item{p_value}{P-value associated with the predictor effect.}
-    \item{r2}{Coefficient of determination (marginal R^2 for mixed models).}
+    \item{r2}{Coefficient of determination (marginal \eqn{R^2} for mixed models).}
+    \item{betas}{Estimated beta parameter of the linear predictor.}
     \item{sign}{Sign of the estimated predictor effect (-1 or +1).}
     \item{d_aic}{AIC reduction compared to the null model.}
     \item{n}{Number of observations used to fit the model.}
@@ -61,7 +62,7 @@ This function fits a regression model separately for each lag window
 defined by the \code{lag_start} and \code{lag_end} columns of the input
 data frame. For each lag window, the model is fitted using
 observations corresponding to different reference dates (\code{date}),
-and summary statistics (p-value, sign of effect, R^2, AIC reduction, sample size) are returned
+and summary statistics (p-value, betas, sign of effect, \eqn{R^2}, AIC reduction, sample size) are returned
 for the specified predictor.
 }
 \details{
@@ -72,8 +73,8 @@ The modelling function used depends on the \code{random} arguments:
   \item \code{random != ""}: \code{\link[glmmTMB]{glmmTMB}}
 }
 
-For mixed-effects models, marginal R^2 (Nakagawa) is returned. For fixed-effects
-models, classical R^2 is used.
+For mixed-effects models, marginal \eqn{R^2} (Nakagawa) is returned. For fixed-effects
+models, classical \eqn{R^2} is used.
 
 
 For each unique combination of \code{lag_start} and \code{lag_end}, the
@@ -82,8 +83,10 @@ function:
   \item Subsets the data to the corresponding lag window,
   \item Removes rows with missing values in the response or predictor,
   \item Fits the specified model,
+  \item Extracts beta parameter of the linear predictor,
   \item Extracts the p-value of the predictor effect,
-  \item Computes the model R^2 (marginal R^2 for mixed models),
+  \item Computes AIC for the specified and null models,
+  \item Computes the model \eqn{R^2} (marginal \eqn{R^2} for mixed models),
   \item Records the sign of the estimated effect and the sample size.
 }
 

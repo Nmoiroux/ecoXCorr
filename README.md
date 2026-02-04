@@ -10,8 +10,7 @@ It provides a coherent workflow to:
 
 The package is particularly suited for studying **delayed environmental effects**, such as the influence of meteorological conditions on insect abundance or disease dynamics.
 
-**ecoXCorr** has less features than amazing **climwin** package. However, because **ecoXCorr** use glmmTMB, it can fit models according to a large variety of error distribution (including negative-binomial, zero-inflated, zero-truncated...).
-**ecoXCorr** is also more flexible for interval lengths of more than one day. It is not restricted to standard time periods such as "week" and "month". 
+`ecoXCorr` has less features than amazing `climwin` package. However, because `ecoXCorr` use `glmmTMB`, it can fit (mixed-)models using a large variety of error distribution (including negative-binomial, zero-inflated, zero-truncated... see `?glmmTMB::family_glmmTMB`) and covariance structures (see `vignette(glmmTMB::covstruct)`). `ecoXCorr` is also more flexible for interval lengths allowing to specify interval in number of days, not restricted to standard time periods (e.g. "week" or "month") as in `climwin`. 
 
 ---
 
@@ -122,7 +121,7 @@ res_glm <- fit_models_by_lag(
 ```r
 ?plotCCM
 
-plotCCM(res_glm, threshold_p = 0.2)
+plotCCM(res_glm, model_outcome ="r2sign", threshold_p = 0.2)
 ```
 Each tile represents a lag window, with colour indicating the signed R²
 (% of variance explained × direction). Non-significant associations (p>0.2) are masked.
@@ -144,7 +143,7 @@ res_glmm <- fit_models_by_lag(
   random     = "(1|area/trap)",
   family     = "truncated_nbinom2")
 
-plotCCM(res_glmm, threshold_p = 0.2)
+plotCCM(res_glmm, model_outcome ="r2sign", threshold_p = 0.2)
 ```
 
 The modelling function used depends on the `random` arguments:

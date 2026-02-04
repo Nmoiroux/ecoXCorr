@@ -2,6 +2,12 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 geom_tile
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 scale_fill_gradient2
+#' @importFrom ggplot2 scale_x_reverse
+#' @importFrom ggplot2 theme_bw
 #' @importFrom glmmTMB bell
 #' @importFrom glmmTMB beta_family
 #' @importFrom glmmTMB betabinomial

@@ -6,17 +6,23 @@
 #' two-dimensional "cross-correlation map", where each tile represents a
 #' lag window defined by \code{lag_start} and \code{lag_end}.
 #'
-#' The colour of each tile corresponds to a signed coefficient of determination
-#' (\eqn{R^2}), computed as the marginal or classical \eqn{R^2} multiplied by the
-#' sign of the estimated effect. Positive associations are shown in red, negative
-#' associations in blue, and non-significant or filtered values are shown in grey.
+#' The colour of each tile corresponds to \code{model_outcome}. Positive associations are shown in red, negative
+#' associations in blue, and non-significant or filtered values (using \code{threshold_p}) are shown in grey.
 #'
-#' The lag window yielding the maximum \eqn{R^2} is highlighted with a coloured
-#' border.
+#' The lag window yielding the maximum absolute value of \code{model_outcome} is highlighted
+#' with a coloured border.
 #'
 #' @param data A data.frame produced by \code{\link{fit_models_by_lag}}, containing
 #'   at least the columns \code{lag_start}, \code{lag_end}, \code{r2},
 #'   \code{p_value}, and \code{sign}.
+#' @param model_outcome Character string specifying the model's outcomes to plot. Either:
+#' \itemize{
+#'   \item \code{"r2sign"} for the signed coefficient of determination (default),
+#'   computed as the marginal or classical \eqn{R^2} multiplied by the sign of the estimated effect,
+#'   \item \code{"r2"} for the coefficient of determination (\eqn{R^2}),
+#'   \item \code{"d_aic"} for the delta AIC (compared to the null model) or,
+#'   \item \code{"betas"} for the estimated beta parameter of the linear predictor.
+#'   }
 #' @param threshold_p Numeric value giving the p-value threshold above which
 #'   associations are masked (set to \code{NA}) in the plot. Default is \code{1},
 #'   meaning that no filtering is applied.
@@ -33,21 +39,40 @@
 #' for visualising results obtained from \code{\link{fit_models_by_lag}}.
 #'
 #' @seealso \code{\link{fit_models_by_lag}}, \code{\link[ggplot2]{ggplot}}
-#' @importFrom ggplot2 ggplot aes geom_tile scale_x_reverse scale_fill_gradient2
 #' @export
 plotCCM <- function(data,
+                    model_outcome = c("r2sign","r2","d_aic","betas"),
 										threshold_p = 1){
 
-	data$r2sign <- data$sign * data$r2
-	data[data$p_value>=threshold_p,"r2sign"] <- NA
-	minr2 <- min(data$r2sign, na.rm = T)
-	maxr2 <- max(data$r2sign, na.rm = T)
-	maxdata <- subset(data, r2 == max(data$r2))
-	data_pos <- subset(data, sign == 1)
-	data_neg <- subset(data, sign == -1)
-	name_legend <- ifelse(minr2<0,"signed r2","r2")
+  model_outcome <- match.arg(model_outcome)
+  indicator <- model_outcome
 
-	plot <- ggplot(data = data, aes(lag_start, lag_end, fill = r2sign)) +
+  if (indicator == "r2sign"){
+    data$r2sign <- data$sign * data$r2
+  }
+
+	data[data$p_value>=threshold_p, indicator] <- NA
+
+	abs_ind <- abs(data[indicator]) # find max absolute of value(s) of indicator
+	index_max <- which(abs_ind == max(abs_ind, na.rm = T)) # index of max
+
+		# scale gradient parameters
+
+	if (indicator == "r2sign"){
+	  minr2 <- min(data$r2sign)
+	  name_legend <- ifelse(minr2<0,"signed r2","r2")
+	} else if (indicator == "d_aic"){
+	  name_legend <- "delta AIC"
+	} else {
+	  name_legend <- indicator
+	}
+
+	limits <- c(min(data[indicator],na.rm=T),max(data[indicator],na.rm=T))
+
+	data$value <- data[,indicator]
+	maxdata <- data[index_max,]
+
+	plot <- ggplot(data = data, aes(lag_start, lag_end, fill = value)) +
 	  geom_tile() +
 	  geom_tile(data = maxdata , color = "deeppink3", linewidth = 1, show.legend = FALSE)+
 	  scale_x_reverse() +
@@ -56,7 +81,7 @@ plotCCM <- function(data,
 			high = "red",
 			mid = "white",
 			midpoint = 0,
-			limit = c(minr2, maxr2),
+			limits = limits,
 			name = name_legend,
 			na.value = "grey"
 		) +
@@ -66,14 +91,13 @@ plotCCM <- function(data,
 }
 
 
-
 #' Fit regression models by lag window on aggregated meteorological predictors
 #'
 #' This function fits a regression model separately for each lag window
 #' defined by the \code{lag_start} and \code{lag_end} columns of the input
 #' data frame. For each lag window, the model is fitted using
 #' observations corresponding to different reference dates (\code{date}),
-#' and summary statistics (p-value, sign of effect, R^2, AIC reduction, sample size) are returned
+#' and summary statistics (p-value, betas, sign of effect, \eqn{R^2}, AIC reduction, sample size) are returned
 #' for the specified predictor.
 #'
 #' Both fixed-effect and mixed-effect models are supported.
@@ -83,8 +107,8 @@ plotCCM <- function(data,
 #'   \item \code{random != ""}: \code{\link[glmmTMB]{glmmTMB}}
 #' }
 #'
-#' For mixed-effects models, marginal R^2 (Nakagawa) is returned. For fixed-effects
-#' models, classical R^2 is used.
+#' For mixed-effects models, marginal \eqn{R^2} (Nakagawa) is returned. For fixed-effects
+#' models, classical \eqn{R^2} is used.
 #'
 #' @param data A data frame containing, at minimum, the columns
 #'   \code{lag_start}, \code{lag_end}, \code{date}, the response variable,
@@ -120,8 +144,10 @@ plotCCM <- function(data,
 #'   \item Subsets the data to the corresponding lag window,
 #'   \item Removes rows with missing values in the response or predictor,
 #'   \item Fits the specified model,
+#'   \item Extracts beta parameter of the linear predictor,
 #'   \item Extracts the p-value of the predictor effect,
-#'   \item Computes the model R^2 (marginal R^2 for mixed models),
+#'   \item Computes AIC for the specified and null models,
+#'   \item Computes the model \eqn{R^2} (marginal \eqn{R^2} for mixed models),
 #'   \item Records the sign of the estimated effect and the sample size.
 #' }
 #'
@@ -135,7 +161,8 @@ plotCCM <- function(data,
 #'     \item{lag_end}{End lag index of the aggregation window.}
 #'     \item{predictor}{Name of the predictor variable.}
 #'     \item{p_value}{P-value associated with the predictor effect.}
-#'     \item{r2}{Coefficient of determination (marginal R^2 for mixed models).}
+#'     \item{r2}{Coefficient of determination (marginal \eqn{R^2} for mixed models).}
+#'     \item{betas}{Estimated beta parameter of the linear predictor.}
 #'     \item{sign}{Sign of the estimated predictor effect (-1 or +1).}
 #'     \item{d_aic}{AIC reduction compared to the null model.}
 #'     \item{n}{Number of observations used to fit the model.}
@@ -225,14 +252,16 @@ fit_models_by_lag <- function(data,
 			r2 <- r2_nakagawa(fit, null_model = fit_null)[[2]]
 			sm <- summary(fit)
 			pval <- sm$coefficients$cond[predictors[1],4]
-			sign <- sign(sm$coefficients$cond[predictors[1],1])
+			betas <- sm$coefficients$cond[predictors[1],1]
+			sign <- sign(betas)
 		} else {
 			fit <- glm(fml, data = dat, family = family, ...)
 			fit_null <- glm(fml_null, data = dat, family = family, ...)
 			r2 <- r2(fit)[[1]]
 			sm <- summary(fit)
 			pval <- sm$coefficients[predictors[1],4]
-			sign <- sign(sm$coefficients[predictors[1],1])
+			betas <- sm$coefficients[predictors[1],1]
+			sign <- sign(betas)
 		}
 
 		aic <- AIC(fit)
@@ -245,6 +274,7 @@ fit_models_by_lag <- function(data,
 			predictor = predictors[1],
 			p_value   = pval,
 			r2        = r2,
+			betas     = betas,
 			sign      = sign,
 			d_aic     = d_aic,
 			n         = n

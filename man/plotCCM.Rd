@@ -4,12 +4,25 @@
 \alias{plotCCM}
 \title{Plot a cross-correlation map (CCM) from lagged regression results}
 \usage{
-plotCCM(data, threshold_p = 1)
+plotCCM(
+  data,
+  model_outcome = c("r2sign", "r2", "d_aic", "betas"),
+  threshold_p = 1
+)
 }
 \arguments{
 \item{data}{A data.frame produced by \code{\link{fit_models_by_lag}}, containing
 at least the columns \code{lag_start}, \code{lag_end}, \code{r2},
 \code{p_value}, and \code{sign}.}
+
+\item{model_outcome}{Character string specifying the model's outcomes to plot. Either:
+\itemize{
+  \item \code{"r2sign"} for the signed coefficient of determination (default),
+  computed as the marginal or classical \eqn{R^2} multiplied by the sign of the estimated effect,
+  \item \code{"r2"} for the coefficient of determination (\eqn{R^2}),
+  \item \code{"d_aic"} for the delta AIC (compared to the null model) or,
+  \item \code{"betas"} for the estimated beta parameter of the linear predictor.
+  }}
 
 \item{threshold_p}{Numeric value giving the p-value threshold above which
 associations are masked (set to \code{NA}) in the plot. Default is \code{1},
@@ -26,13 +39,11 @@ two-dimensional "cross-correlation map", where each tile represents a
 lag window defined by \code{lag_start} and \code{lag_end}.
 }
 \details{
-The colour of each tile corresponds to a signed coefficient of determination
-(\eqn{R^2}), computed as the marginal or classical \eqn{R^2} multiplied by the
-sign of the estimated effect. Positive associations are shown in red, negative
-associations in blue, and non-significant or filtered values are shown in grey.
+The colour of each tile corresponds to \code{model_outcome}. Positive associations are shown in red, negative
+associations in blue, and non-significant or filtered values (using \code{threshold_p}) are shown in grey.
 
-The lag window yielding the maximum \eqn{R^2} is highlighted with a coloured
-border.
+The lag window yielding the maximum absolute value of \code{model_outcome} is highlighted
+with a coloured border.
 
 
 The x-axis corresponds to \code{lag_start} (displayed in reverse order), and
