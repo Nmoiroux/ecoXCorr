@@ -116,7 +116,7 @@ res_glm <- fit_models_by_lag(
 
 ```
 
-### Visualise results as a cross-correlation map
+### Visualise results as cross-correlation maps
 
 ```r
 ?plotCCM
@@ -126,6 +126,13 @@ plotCCM(res_glm, model_outcome ="r2sign", threshold_p = 0.2)
 Each tile represents a lag window, with colour indicating the signed R²
 (% of variance explained × direction). Non-significant associations (p>0.2) are masked.
 
+Other outcomes can be plotted (R², AIC difference with the null model, beta parameter of the linear predictor):
+
+```r
+plotCCM(res_glm, model_outcome = "r2")
+plotCCM(res_glm, model_outcome = "d_aic")
+plotCCM(res_glm, model_outcome = "betas")
+```
 
 ### Mixed-effects model example
 
