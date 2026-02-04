@@ -126,7 +126,7 @@ plotCCM(res_glm, model_outcome ="r2sign", threshold_p = 0.2)
 Each tile represents a lag window, with colour indicating the signed R²
 (% of variance explained × direction). Non-significant associations (p>0.2) are masked.
 
-Other outcomes can be plotted (R², AIC difference with the null model, beta parameter of the linear predictor):
+Other outcomes can be plotted (R², AIC difference with the null model, beta parameters of the linear predictor):
 
 ```r
 plotCCM(res_glm, model_outcome = "r2")
@@ -169,16 +169,21 @@ ecoXCorr is useful when:
 
 Typical applications include:
 
+- variable and feature selection in modelling
 - vector ecology
 - disease ecology
 - environmental epidemiology
 - climate–biology interactions
 
 
-### References 
+### References (Methods)
 
-- Curriero FC, Shone SM, Glass GE. (2005) Cross correlation maps: a tool for visualizing and modeling time lagged associations. *Vector Borne Zoonotic Dis.* [doi:10.1089/vbz.2005.5.267](https://doi.org/10.1089/vbz.2005.5.267)
-- van de Pol M, Bailey LD, McLean N, et al. (2016) Identifying the best climatic predictors in ecology and evolution. *Methods in Ecology and Evolution.* [doi:10.1111/2041-210X.12590](https://doi.org/10.1111/2041-210X.12590)
+1.  Curriero FC, Shone SM, Glass GE. (2005) Cross correlation maps: a tool for visualizing and modeling time lagged associations. *Vector Borne Zoonotic Dis.* [doi:10.1089/vbz.2005.5.267](https://doi.org/10.1089/vbz.2005.5.267)
+2.  van de Pol M, Bailey LD, McLean N, et al. (2016) Identifying the best climatic predictors in ecology and evolution. *Methods in Ecology and Evolution.* [doi:10.1111/2041-210X.12590](https://doi.org/10.1111/2041-210X.12590)
+
+### References (Usage)
+3.  Bartholomée C, Taconet P, Mercat M, Grail C, Bouhsira E, Fournet F, et al. Investigating the role of urban vegetation alongside other environmental variables in shaping Aedes albopictus presence and abundance in Montpellier, France. PLOS ONE. 2025;20: e0335793. [doi:10.1371/journal.pone.0335793](https://doi.org/10.1371/journal.pone.0335793)
+4.  Taconet P, Porciani A, Soma DD, Mouline K, Simard F, Koffi AA, et al. Data-driven and interpretable machine-learning modeling to explore the fine-scale environmental determinants of malaria vectors biting rates in rural Burkina Faso. Parasites & Vectors. 2021;14: 345. [doi:10.1186/s13071-021-04851-x](https://doi.org/10.1186/s13071-021-04851-x)
 
 
 ### License 
