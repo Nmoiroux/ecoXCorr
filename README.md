@@ -15,7 +15,7 @@ The package is particularly suited for studying **delayed environmental effects*
 Below is an exemple of figure computed using `ecoXCorr`.
 ![plot](/man/figures/Rplot.jpg)
 
-*Fig. 1: Cross correlation maps showing the lagged effect of rainfall on Ae. albopictus abundance. Time lags are expressed in days prior to sampling. The signed R² reflects the variance explained by the explanatory variable, multiplied by the sign of the estimated effect. Red-bordered square highlight the time lag with the highest R². Gray squares represent correlations with p-values > 0.05.* 
+*Fig. 1: Cross correlation maps showing the lagged effect of rainfall on Ae. albopictus abundance. Time lags are expressed in days prior to sampling. The signed R² reflects the variance explained by the explanatory variable, multiplied by the sign of the estimated effect. Red-bordered square highlight the time lag with the highest R². Grey squares represent correlations with adjusted (for multiple testing) p-values > 0.05.* 
 
 ---
 
