@@ -9,7 +9,7 @@ fit_models_by_lag(
   response,
   predictors,
   random = "",
-  family = "gaussian()",
+  family = gaussian(),
   min_n = 10,
   track = F,
   ...
@@ -29,7 +29,7 @@ will result in an error.}
 \item{random}{Optional character string specifying random-effects terms
 to be added to the model formula (without a leading \code{+}), e.g.
 \code{"(1 | site/year)"} or \code{"(1 | site) + (1 | year)"} (\code{?glmmTMB::glmmTMB}).
-If empty (default), a fixed-effect model is fitted.}
+If empty (default), a fixed-effect model is fitted (using \code{glm()}.}
 
 \item{family}{Character string. The name of a family function
 to be used in GLM or GLMM models. Default to "gaussian" (Linear model).
@@ -49,12 +49,13 @@ A data frame with one row per lag window, containing:
     \item{lag_start}{Start lag index of the aggregation window.}
     \item{lag_end}{End lag index of the aggregation window.}
     \item{predictor}{Name of the predictor variable.}
-    \item{p_value}{P-value associated with the predictor effect.}
     \item{r2}{Coefficient of determination (marginal \eqn{R^2} for mixed models).}
     \item{betas}{Estimated beta parameter of the linear predictor.}
     \item{sign}{Sign of the estimated predictor effect (-1 or +1).}
     \item{d_aic}{AIC reduction compared to the null model.}
     \item{n}{Number of observations used to fit the model.}
+    \item{p_value}{P-value associated with the predictor effect.}
+    \item{p_adj}{P-value adjusted for multiple testing.}
   }
 }
 \description{
@@ -62,7 +63,7 @@ This function fits a regression model separately for each lag window
 defined by the \code{lag_start} and \code{lag_end} columns of the input
 data frame. For each lag window, the model is fitted using
 observations corresponding to different reference dates (\code{date}),
-and summary statistics (p-value, betas, sign of effect, \eqn{R^2}, AIC reduction, sample size) are returned
+and summary statistics (betas, sign of effect, \eqn{R^2}, AIC reduction, sample size, p-value, p-value adjusted for multiple testing) are returned
 for the specified predictor.
 }
 \details{
@@ -87,12 +88,38 @@ function:
   \item Extracts the p-value of the predictor effect,
   \item Computes AIC for the specified and null models,
   \item Computes the model \eqn{R^2} (marginal \eqn{R^2} for mixed models),
-  \item Records the sign of the estimated effect and the sample size.
+  \item Records the sign of the estimated effect and the sample size,
+  \item Computes adjusted p-value using the False Discovery Rate method [Ref Benjamini and Yekutieli]
 }
 
 The returned table is suitable for lag-window screening, heatmap
 visualisation, or sensitivity analyses in epidemiological or ecological
 studies.
+}
+\examples{
+sampling_dates <- unique(albopictusMPL2023$date)
+
+met_agg <- aggregate_lagged_intervals(
+data       = meteoMPL2023,
+date_col   = "date",
+value_cols = c("rain_sum", "temp_mean"),
+d          = sampling_dates,
+i          = 7,
+m          = 8
+)
+
+albo_lag <- merge(met_agg, albopictusMPL2023, by = "date", all = TRUE)
+
+res_glm <- fit_models_by_lag(
+data       = albo_lag,
+response   = "individualCount",
+predictors = "rain_sum_sum",
+random     = "",
+family     = "poisson"
+)
+
+head(res_glm)
+
 }
 \seealso{
 \code{\link[glmmTMB]{glmmTMB}},

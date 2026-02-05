@@ -25,7 +25,8 @@ at least the columns \code{lag_start}, \code{lag_end}, \code{r2},
   }}
 
 \item{threshold_p}{Numeric value giving the p-value threshold above which
-associations are masked (set to \code{NA}) in the plot. Default is \code{1},
+associations are masked (set to \code{NA}) in the plot. Filtering is performed on
+the adjusted (for multiple testing) p-values \code{p_adj}. (Default is \code{1},
 meaning that no filtering is applied.}
 }
 \value{
@@ -53,6 +54,34 @@ are not displayed and appear in grey.
 
 This function does not perform any modelling itself; it is intended solely
 for visualising results obtained from \code{\link{fit_models_by_lag}}.
+}
+\examples{
+sampling_dates <- unique(albopictusMPL2023$date)
+
+met_agg <- aggregate_lagged_intervals(
+data       = meteoMPL2023,
+date_col   = "date",
+value_cols = c("rain_sum", "temp_mean"),
+d          = sampling_dates,
+i          = 7,
+m          = 8
+)
+
+albo_lag <- merge(met_agg, albopictusMPL2023, by = "date", all = TRUE)
+
+res_glm <- fit_models_by_lag(
+data       = albo_lag,
+response   = "individualCount",
+predictors = "rain_sum_sum",
+random     = "",
+family     = "poisson"
+)
+
+plotCCM(res_glm, model_outcome = "r2sign", threshold_p = 0.05)
+plotCCM(res_glm, model_outcome = "r2")
+plotCCM(res_glm, model_outcome = "d_aic")
+plotCCM(res_glm, model_outcome = "betas", threshold_p = 0.05)
+
 }
 \seealso{
 \code{\link{fit_models_by_lag}}, \code{\link[ggplot2]{ggplot}}

@@ -82,3 +82,18 @@ missing if no observations fall within it.
 Console messages are printed to inform the user of reference dates for which
 missing data or truncated intervals occurred.
 }
+\examples{
+sampling_dates <- unique(albopictusMPL2023$date)
+
+met_agg <- aggregate_lagged_intervals(
+data       = meteoMPL2023,
+date_col   = "date",
+value_cols = c("rain_sum", "temp_mean"),
+d          = sampling_dates,
+i          = 7,
+m          = 8
+)
+
+head(met_agg)
+
+}
