@@ -24,7 +24,8 @@
 #'   \item \code{"betas"} for the estimated beta parameter of the linear predictor.
 #'   }
 #' @param threshold_p Numeric value giving the p-value threshold above which
-#'   associations are masked (set to \code{NA}) in the plot. Default is \code{1},
+#'   associations are masked (set to \code{NA}) in the plot. Filtering is performed on
+#'   the adjusted (for multiple testing) p-values \code{p_adj}. (Default is \code{1},
 #'   meaning that no filtering is applied.
 #'
 #' @return A \code{ggplot2} object representing the cross-correlation map.
@@ -59,8 +60,7 @@
 #' response   = "individualCount",
 #' predictors = "rain_sum_sum",
 #' random     = "",
-#' family     = "poisson",
-#' track = T
+#' family     = "poisson"
 #' )
 #'
 #' plotCCM(res_glm, model_outcome = "r2sign", threshold_p = 0.05)
@@ -223,8 +223,7 @@ plotCCM <- function(data,
 #' response   = "individualCount",
 #' predictors = "rain_sum_sum",
 #' random     = "",
-#' family     = "poisson",
-#' track = T
+#' family     = "poisson(link = 'log')"
 #' )
 #'
 #' head(res_glm)

@@ -12,6 +12,10 @@ The package is particularly suited for studying **delayed environmental effects*
 
 `ecoXCorr` has less features than amazing `climwin` package. However, because `ecoXCorr` use `glmmTMB`, it can fit (mixed-)models using a large variety of error distribution (including negative-binomial, zero-inflated, zero-truncated... see `?glmmTMB::family_glmmTMB`) and covariance structures (see `vignette(glmmTMB::covstruct)`). `ecoXCorr` is also more flexible for interval lengths allowing to specify interval in number of days, not restricted to standard time periods (e.g. "week" or "month") as in `climwin`. 
 
+Below is an exemple of figure computed using `ecoXCorr`.
+![plot](/man/figures/Rplot.jpg)
+Fig. 1: Cross correlation maps showing the lagged effect of rainfall on Ae. albopictus abundance. Time lags are expressed in days prior to sampling. The signed R² reflects the variance explained by the explanatory variable, multiplied by the sign of the estimated effect. Red-bordered square highlight the time lag with the highest R². Gray squares represent correlations with p-values > 0.05. 
+
 ---
 
 ## Installation
