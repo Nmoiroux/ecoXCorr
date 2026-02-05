@@ -204,7 +204,7 @@ fit_models_by_lag <- function(data,
 		mixed <- TRUE
 		if (n_mod_to_fit > 30){
 			message(
-				"There are ",	paste0(n_mod_to_fit)," models to be fitted, which may take some time..."
+				"There are ",	paste0(n_mod_to_fit),"x2 models to be fitted, which may take some time..."
 			)
 		}
 	} else {
@@ -264,8 +264,8 @@ fit_models_by_lag <- function(data,
 			sign <- sign(betas)
 		}
 
-		aic <- AIC(fit)
-		aic_null <- AIC(fit_null)
+		aic <- performance_aic(fit)
+		aic_null <- performance_aic(fit_null)
 		d_aic <- aic - aic_null
 
 		results[[k]] <- data.frame(
