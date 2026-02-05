@@ -39,6 +39,35 @@
 #' for visualising results obtained from \code{\link{fit_models_by_lag}}.
 #'
 #' @seealso \code{\link{fit_models_by_lag}}, \code{\link[ggplot2]{ggplot}}
+#'
+#' @examples
+#' sampling_dates <- unique(albopictusMPL2023$date)
+#'
+#' met_agg <- aggregate_lagged_intervals(
+#' data       = meteoMPL2023,
+#' date_col   = "date",
+#' value_cols = c("rain_sum", "temp_mean"),
+#' d          = sampling_dates,
+#' i          = 7,
+#' m          = 8
+#' )
+#'
+#' albo_lag <- merge(met_agg, albopictusMPL2023, by = "date", all = TRUE)
+#'
+#' res_glm <- fit_models_by_lag(
+#' data       = albo_lag,
+#' response   = "individualCount",
+#' predictors = "rain_sum_sum",
+#' random     = "",
+#' family     = "poisson",
+#' track = T
+#' )
+#'
+#' plotCCM(res_glm, model_outcome = "r2sign", threshold_p = 0.05)
+#' plotCCM(res_glm, model_outcome = "r2")
+#' plotCCM(res_glm, model_outcome = "d_aic")
+#' plotCCM(res_glm, model_outcome = "betas", threshold_p = 0.05)
+#'
 #' @export
 plotCCM <- function(data,
                     model_outcome = c("r2sign","r2","d_aic","betas"),
@@ -51,7 +80,7 @@ plotCCM <- function(data,
     data$r2sign <- data$sign * data$r2
   }
 
-	data[data$p_value>=threshold_p, indicator] <- NA
+	data[data$p_adj>=threshold_p, indicator] <- NA
 
 	abs_ind <- abs(data[indicator]) # find max absolute of value(s) of indicator
 	index_max <- which(abs_ind == max(abs_ind, na.rm = T)) # index of max
@@ -97,7 +126,7 @@ plotCCM <- function(data,
 #' defined by the \code{lag_start} and \code{lag_end} columns of the input
 #' data frame. For each lag window, the model is fitted using
 #' observations corresponding to different reference dates (\code{date}),
-#' and summary statistics (p-value, betas, sign of effect, \eqn{R^2}, AIC reduction, sample size) are returned
+#' and summary statistics (betas, sign of effect, \eqn{R^2}, AIC reduction, sample size, p-value, p-value adjusted for multiple testing) are returned
 #' for the specified predictor.
 #'
 #' Both fixed-effect and mixed-effect models are supported.
@@ -123,7 +152,7 @@ plotCCM <- function(data,
 #' @param random Optional character string specifying random-effects terms
 #'   to be added to the model formula (without a leading \code{+}), e.g.
 #'   \code{"(1 | site/year)"} or \code{"(1 | site) + (1 | year)"} (\code{?glmmTMB::glmmTMB}).
-#'   If empty (default), a fixed-effect model is fitted.
+#'   If empty (default), a fixed-effect model is fitted (using \code{glm()}.
 #'
 #' @param family Character string. The name of a family function
 #'   to be used in GLM or GLMM models. Default to "gaussian" (Linear model).
@@ -148,7 +177,8 @@ plotCCM <- function(data,
 #'   \item Extracts the p-value of the predictor effect,
 #'   \item Computes AIC for the specified and null models,
 #'   \item Computes the model \eqn{R^2} (marginal \eqn{R^2} for mixed models),
-#'   \item Records the sign of the estimated effect and the sample size.
+#'   \item Records the sign of the estimated effect and the sample size,
+#'   \item Computes adjusted p-value using the False Discovery Rate method [Ref Benjamini and Yekutieli]
 #' }
 #'
 #' The returned table is suitable for lag-window screening, heatmap
@@ -160,18 +190,44 @@ plotCCM <- function(data,
 #'     \item{lag_start}{Start lag index of the aggregation window.}
 #'     \item{lag_end}{End lag index of the aggregation window.}
 #'     \item{predictor}{Name of the predictor variable.}
-#'     \item{p_value}{P-value associated with the predictor effect.}
 #'     \item{r2}{Coefficient of determination (marginal \eqn{R^2} for mixed models).}
 #'     \item{betas}{Estimated beta parameter of the linear predictor.}
 #'     \item{sign}{Sign of the estimated predictor effect (-1 or +1).}
 #'     \item{d_aic}{AIC reduction compared to the null model.}
 #'     \item{n}{Number of observations used to fit the model.}
+#'     \item{p_value}{P-value associated with the predictor effect.}
+#'     \item{p_adj}{P-value adjusted for multiple testing.}
 #'   }
 #'
 #' @seealso
 #' \code{\link[glmmTMB]{glmmTMB}},
 #' \code{\link[performance]{r2}},
 #' \code{\link[performance]{r2_nakagawa}}
+#'
+#' @examples
+#' sampling_dates <- unique(albopictusMPL2023$date)
+#'
+#' met_agg <- aggregate_lagged_intervals(
+#' data       = meteoMPL2023,
+#' date_col   = "date",
+#' value_cols = c("rain_sum", "temp_mean"),
+#' d          = sampling_dates,
+#' i          = 7,
+#' m          = 8
+#' )
+#'
+#' albo_lag <- merge(met_agg, albopictusMPL2023, by = "date", all = TRUE)
+#'
+#' res_glm <- fit_models_by_lag(
+#' data       = albo_lag,
+#' response   = "individualCount",
+#' predictors = "rain_sum_sum",
+#' random     = "",
+#' family     = "poisson",
+#' track = T
+#' )
+#'
+#' head(res_glm)
 #'
 #' @export
 fit_models_by_lag <- function(data,
@@ -272,18 +328,19 @@ fit_models_by_lag <- function(data,
 			lag_start = ls,
 			lag_end   = le,
 			predictor = predictors[1],
-			p_value   = pval,
 			r2        = r2,
 			betas     = betas,
 			sign      = sign,
 			d_aic     = d_aic,
-			n         = n
+			n         = n,
+			p_value   = pval
 		)
 
 		k <- k + 1
 	}
 
 	results <- do.call(rbind, results)
+	results$p_adj <- p.adjust(results$p_value, method = "BY") # adjust p_value for multiple testing
 	rownames(results) <- 1:nrow(results)
 
 	if (mixed == TRUE & n_mod_to_fit > 30){
@@ -355,6 +412,20 @@ fit_models_by_lag <- function(data,
 #'
 #' Console messages are printed to inform the user of reference dates for which
 #' missing data or truncated intervals occurred.
+#'
+#' @examples
+#' sampling_dates <- unique(albopictusMPL2023$date)
+#'
+#' met_agg <- aggregate_lagged_intervals(
+#' data       = meteoMPL2023,
+#' date_col   = "date",
+#' value_cols = c("rain_sum", "temp_mean"),
+#' d          = sampling_dates,
+#' i          = 7,
+#' m          = 8
+#' )
+#'
+#' head(met_agg)
 #'
 #' @export
 aggregate_lagged_intervals <- function(data,date_col,value_cols,d,

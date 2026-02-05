@@ -37,6 +37,7 @@
 #' @importFrom stats gaussian
 #' @importFrom stats glm
 #' @importFrom stats inverse.gaussian
+#' @importFrom stats p.adjust
 #' @importFrom stats poisson
 #' @importFrom stats quasi
 #' @importFrom stats quasibinomial
