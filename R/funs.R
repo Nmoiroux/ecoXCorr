@@ -88,7 +88,7 @@ plotCCM <- function(data,
 		# scale gradient parameters
 
 	if (indicator == "r2sign"){
-	  name_legend <- "signed R²"
+	  name_legend <- "signed R2"
 	} else if (indicator == "d_aic"){
 	  name_legend <- "delta AIC"
 	} else {
@@ -115,7 +115,7 @@ plotCCM <- function(data,
 		) +
 	  theme_bw()
 
-	plot
+	return(plot)
 }
 
 
@@ -222,7 +222,7 @@ plotCCM <- function(data,
 #' response   = "individualCount",
 #' predictors = "rain_sum_sum",
 #' random     = "",
-#' family     = "poisson(link = 'log')"
+#' family     = "poisson"
 #' )
 #'
 #' head(res_glm)
@@ -239,9 +239,13 @@ fit_models_by_lag <- function(data,
 
 	out <- data
 
+
 	# Ensure response exists
 	stopifnot(response %in% names(out))
 	stopifnot(all(predictors %in% names(out)))
+	stopifnot(is.character(family))
+	stopifnot(family %in% c(.glmmtmb_family,.glm_family))
+
 
 	# Bi- or multi-variate model ?
 	if (length(predictors) >1 ){
@@ -305,7 +309,7 @@ fit_models_by_lag <- function(data,
 		}
 
 		# Fit model
-		if (mixed == T){
+		if (mixed == T ){
 			fit <- glmmTMB(fml, data = dat, family = family, ...)
 			fit_null <- glmmTMB(fml_null, data = dat, family = family, ...)
 			r2 <- r2_nakagawa(fit, null_model = fit_null)[[2]]
