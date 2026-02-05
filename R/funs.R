@@ -88,8 +88,7 @@ plotCCM <- function(data,
 		# scale gradient parameters
 
 	if (indicator == "r2sign"){
-	  minr2 <- min(data$r2sign)
-	  name_legend <- ifelse(minr2<0,"signed r2","r2")
+	  name_legend <- "signed R²"
 	} else if (indicator == "d_aic"){
 	  name_legend <- "delta AIC"
 	} else {
@@ -233,7 +232,7 @@ fit_models_by_lag <- function(data,
 															response,
 															predictors,
 															random = "", # Random-effects terms to be added to the formulae, wihtout initial "+", e.g. "(a|b/c)+(a|d)"
-															family = "gaussian()",
+															family = "gaussian",
 															min_n = 10,
 															track = F,
 															...) {
@@ -264,6 +263,11 @@ fit_models_by_lag <- function(data,
 		}
 	} else {
 		mixed <- FALSE
+		if (n_mod_to_fit > 100){
+		  message(
+		    "There are ",	paste0(n_mod_to_fit),"x2 models to be fitted, which may take some time..."
+		  )
+		}
 	}
 
 
@@ -342,10 +346,7 @@ fit_models_by_lag <- function(data,
 	results$p_adj <- p.adjust(results$p_value, method = "BY") # adjust p_value for multiple testing
 	rownames(results) <- 1:nrow(results)
 
-	if (mixed == TRUE & n_mod_to_fit > 30){
-		message("Done !")
-	}
-
+	message("Done !")
 
 	return(results)
 
