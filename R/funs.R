@@ -17,11 +17,11 @@
 #'   \code{p_value}, and \code{sign}.
 #' @param model_outcome Character string specifying the model's outcomes to plot. Either:
 #' \itemize{
-#'   \item \code{"r2sign"} for the signed coefficient of determination (default),
+#'   \item \code{"d_aic"} for the delta AIC (compared to the null model) (default),
+#'   \item \code{"R2sign"} for the signed coefficient of determination,
 #'   computed as the marginal or classical \eqn{R^2} multiplied by the sign of the estimated effect,
-#'   \item \code{"r2"} for the coefficient of determination (\eqn{R^2}),
-#'   \item \code{"d_aic"} for the delta AIC (compared to the null model) or,
-#'   \item \code{"betas"} for the estimated beta parameter of the linear predictor.
+#'   \item \code{"R2"} for the coefficient of determination (\eqn{R^2}) or,
+#'   \item \code{"betas"} for the estimated beta parameter (slope) of the linear predictor.
 #'   }
 #' @param threshold_p Numeric value giving the p-value threshold above which
 #'   associations are masked (set to \code{NA}) in the plot. Filtering is performed on
@@ -63,43 +63,55 @@
 #' family     = "poisson"
 #' )
 #'
-#' plotCCM(res_glm, model_outcome = "r2sign", threshold_p = 0.05)
-#' plotCCM(res_glm, model_outcome = "r2")
+#' plotCCM(res_glm, model_outcome = "R2sign", threshold_p = 0.05)
+#' plotCCM(res_glm, model_outcome = "R2")
 #' plotCCM(res_glm, model_outcome = "d_aic")
 #' plotCCM(res_glm, model_outcome = "betas", threshold_p = 0.05)
 #'
 #' @export
 plotCCM <- function(data,
-                    model_outcome = c("r2sign","r2","d_aic","betas"),
+                    model_outcome = c("d_aic","R2sign","R2","betas","weight"),
 										threshold_p = 1){
 
   model_outcome <- match.arg(model_outcome)
   indicator <- model_outcome
 
-  if (indicator == "r2sign"){
-    data$r2sign <- data$sign * data$r2
+  # get R2 name from data
+  R2_type <- names(data)[which(grepl('^R2',names(data))==TRUE)]
+  if (indicator == "R2"){
+    indicator <- R2_type
   }
 
+  # compute signed R2
+  if (indicator == "R2sign"){
+    data$R2sign <- data$sign * data[,R2_type]
+  }
+
+  # filter data according to p-value
 	data[data$p_adj>=threshold_p, indicator] <- NA
 
+	# find max absolute indicator
 	abs_ind <- abs(data[indicator]) # find max absolute of value(s) of indicator
 	index_max <- which(abs_ind == max(abs_ind, na.rm = T)) # index of max
 
-		# scale gradient parameters
 
-	if (indicator == "r2sign"){
-	  name_legend <- "signed R2"
+	# legend name
+	if (indicator == "R2sign"){
+	  name_legend <- paste("signed", R2_type, sep="\n")
 	} else if (indicator == "d_aic"){
 	  name_legend <- "delta AIC"
 	} else {
 	  name_legend <- indicator
 	}
 
+	# legend limits
 	limits <- c(min(data[indicator],na.rm=T),max(data[indicator],na.rm=T))
 
+	# value to plot
 	data$value <- data[,indicator]
 	maxdata <- data[index_max,]
 
+  # plot
 	plot <- ggplot(data = data, aes(lag_start, lag_end, fill = value)) +
 	  geom_tile() +
 	  geom_tile(data = maxdata , color = "deeppink3", linewidth = 1, show.legend = FALSE)+
@@ -115,6 +127,10 @@ plotCCM <- function(data,
 		) +
 	  theme_bw()
 
+	# message
+	message(paste0("Cross correlation maps showing ",model_outcome," for the lagged effect of ", unique(data$predictor) ," on ", unique(data$response),". Pink-bordered square highlight the time lag with the highest absolute ",model_outcome,". Grey squares show intervals whith adjusted (for multiple testing) p-values > ",threshold_p,"."))
+
+	# return plot
 	return(plot)
 }
 
@@ -129,14 +145,16 @@ plotCCM <- function(data,
 #' for the specified predictor.
 #'
 #' Both fixed-effect and mixed-effect models are supported.
-#' The modelling function used depends on the \code{random} arguments:
+#'
+#' The modelling function used depends on the \code{random} and \code{family} arguments:
 #' \itemize{
-#'   \item \code{random = ""}:  \code{\link[stats]{glm}}
-#'   \item \code{random != ""}: \code{\link[glmmTMB]{glmmTMB}}
+#'   \item \code{random} is not specified (default):  \code{\link[stats]{glm}}
+#'   \item \code{random} is note an empty string OR \code{family} is a valid glmmTMB family: \code{\link[glmmTMB]{glmmTMB}}
 #' }
 #'
 #' For mixed-effects models, marginal \eqn{R^2} (Nakagawa) is returned. For fixed-effects
-#' models, classical \eqn{R^2} is used.
+#' models, appropriate \eqn{R^2} is used (see \code{?performance::r2()}).
+#' Depending on model specification (depending on \code{random} and/or \code{family}), \eqn{R^2} for \code{\link[glmmTMB]{glmmTMB}} models may not be computed: the returned error or warning is printed in the console.
 #'
 #' @param data A data frame containing, at minimum, the columns
 #'   \code{lag_start}, \code{lag_end}, \code{date}, the response variable,
@@ -148,9 +166,9 @@ plotCCM <- function(data,
 #'   a single predictor is supported; providing more than one predictor
 #'   will result in an error.
 #'
-#' @param random Optional character string specifying random-effects terms
-#'   to be added to the model formula (without a leading \code{+}), e.g.
-#'   \code{"(1 | site/year)"} or \code{"(1 | site) + (1 | year)"} (\code{?glmmTMB::glmmTMB}).
+#' @param random Optional character string specifying random-effects terms or
+#'   covariance structure to be added to the model formula (without a leading \code{+}), e.g.
+#'   \code{"(1 | site/year)"}, \code{"(1 | site) + (1 | year)"} or \code{"ar1(times + 0 | group)"} (\code{?glmmTMB::glmmTMB}).
 #'   If empty (default), a fixed-effect model is fitted (using \code{glm()}.
 #'
 #' @param family Character string. The name of a family function
@@ -175,7 +193,7 @@ plotCCM <- function(data,
 #'   \item Extracts beta parameter of the linear predictor,
 #'   \item Extracts the p-value of the predictor effect,
 #'   \item Computes AIC for the specified and null models,
-#'   \item Computes the model \eqn{R^2} (marginal \eqn{R^2} for mixed models),
+#'   \item Computes the appropriate model\eqn{R^2} (marginal Nakagawa \eqn{R^2} for mixed models),
 #'   \item Records the sign of the estimated effect and the sample size,
 #'   \item Computes adjusted p-value using the False Discovery Rate method [Ref Benjamini and Yekutieli]
 #' }
@@ -188,8 +206,9 @@ plotCCM <- function(data,
 #'   \describe{
 #'     \item{lag_start}{Start lag index of the aggregation window.}
 #'     \item{lag_end}{End lag index of the aggregation window.}
+#'     \item{response}{Name of the response variable.}
 #'     \item{predictor}{Name of the predictor variable.}
-#'     \item{r2}{Coefficient of determination (marginal \eqn{R^2} for mixed models).}
+#'     \item{R2...}{Coefficient of determination (marginal \eqn{R^2} for mixed models).}
 #'     \item{betas}{Estimated beta parameter of the linear predictor.}
 #'     \item{sign}{Sign of the estimated predictor effect (-1 or +1).}
 #'     \item{d_aic}{AIC reduction compared to the null model.}
@@ -262,20 +281,39 @@ fit_models_by_lag <- function(data,
 		mixed <- TRUE
 		if (n_mod_to_fit > 30){
 			message(
-				"There are ",	paste0(n_mod_to_fit),"x2 models to be fitted, which may take some time..."
+				"There are ",	paste0(n_mod_to_fit)," models to be fitted, which may take some time..."
 			)
 		}
 	} else {
 		mixed <- FALSE
 		if (n_mod_to_fit > 100){
 		  message(
-		    "There are ",	paste0(n_mod_to_fit),"x2 models to be fitted, which may take some time..."
+		    "There are ",	paste0(n_mod_to_fit)," models to be fitted, which may take some time..."
 		  )
 		}
 	}
 
+	# Build formula
+	if (mixed == TRUE) {
+	  fml <- as.formula(
+	    paste(response, "~", paste(c(predictors,random), collapse = " + ")))
+	  fml_null <- as.formula(
+	    paste(response, "~", paste(c("1",random), collapse = " + ")))
+	} else {
+	  fml <- as.formula(
+	    paste(response, "~", paste(predictors, collapse = " + ")))
+	  fml_null <- as.formula(
+	    paste(response, "~ 1"))
+	}
+
+	mod_fun <- ifelse(mixed == T | (family %in% .glmmtmb_family), "glmmTMB", "glm")
+
+	message(paste0("The fitted models will be of the form: ",mod_fun,"(",deparse1(fml),", family=",family,")"))
+
 
 	results <- list()
+
+	warns <- c()
 	k <- 1
 
 	for (i in seq_len(nrow(lag_windows))) {
@@ -287,55 +325,72 @@ fit_models_by_lag <- function(data,
 		dat <- out[out$lag_start == ls &
 							 	out$lag_end   == le, ]
 
+
 		n <- nrow(dat)
 		#if (n < min_n) next
 		if (var(dat[,predictors[1]])==0) next # will lead to singularities so next
 
-		# Build formula
-		if (mixed == TRUE) {
-			fml <- as.formula(
-				paste(response, "~", paste(c(predictors,random), collapse = " + ")))
-			fml_null <- as.formula(
-				paste(response, "~", paste(c("1",random), collapse = " + ")))
-		} else {
-			fml <- as.formula(
-				paste(response, "~", paste(predictors, collapse = " + ")))
-			fml_null <- as.formula(
-			  paste(response, "~ 1"))
-		}
 
 		if (track == T){
 			print(lag_windows[i,])
 		}
 
-		# Fit model
-		if (mixed == T ){
+		# Fit null model (only required one time), allways the same
+		if (i==1 & mod_fun == "glmmTMB"){
+		  fit_null <- glmmTMB(fml_null, data = dat, family = family, ...)
+		} else if(i==1 & mod_fun == "glm"){
+		  fit_null <- glm(fml_null, data = dat, family = family, ...)
+		}
+
+		# Fit model and extract betas and p-value
+		if (mod_fun == "glmmTMB"){
 			fit <- glmmTMB(fml, data = dat, family = family, ...)
-			fit_null <- glmmTMB(fml_null, data = dat, family = family, ...)
-			r2 <- r2_nakagawa(fit, null_model = fit_null)[[2]]
 			sm <- summary(fit)
 			pval <- sm$coefficients$cond[predictors[1],4]
 			betas <- sm$coefficients$cond[predictors[1],1]
 			sign <- sign(betas)
-		} else {
+		} else if(mod_fun == "glm"){
 			fit <- glm(fml, data = dat, family = family, ...)
-			fit_null <- glm(fml_null, data = dat, family = family, ...)
-			r2 <- r2(fit)[[1]]
 			sm <- summary(fit)
 			pval <- sm$coefficients[predictors[1],4]
 			betas <- sm$coefficients[predictors[1],1]
 			sign <- sign(betas)
 		}
 
+    # Compute R2
+		r2_res <- tryCatch({
+		  r2(fit, null_model = fit_null)
+		},error = function(e) {
+		  warns <<- c(warns, paste0("Error in R2 computing (performance::r2()):",
+		                            conditionMessage(e)))
+		  return(NA)
+		},warning = function(w){
+		  warns <<- c(warns, paste0("Warning in R2 computing (performance::r2()):",
+		                            conditionMessage(w)))
+		  return(NA)
+		} )
+
+		if (mixed == TRUE & !all(is.na(r2_res))){
+		  r2 <- r2_res[2]
+		}else if(mixed == FALSE & !all(is.na(r2_res))){
+		  r2 <- r2_res[1]
+		}else if(all(is.na(r2_res))){
+		  r2 <- NA
+		}
+
+
+		# compute delta AIC
 		aic <- performance_aic(fit)
 		aic_null <- performance_aic(fit_null)
 		d_aic <- aic - aic_null
 
+		# fill results dataframe
 		results[[k]] <- data.frame(
 			lag_start = ls,
 			lag_end   = le,
+			response  = response,
 			predictor = predictors[1],
-			r2        = r2,
+			R2        = r2,
 			betas     = betas,
 			sign      = sign,
 			d_aic     = d_aic,
@@ -346,11 +401,21 @@ fit_models_by_lag <- function(data,
 		k <- k + 1
 	}
 
+
 	results <- do.call(rbind, results)
+
+	# Akaike weight
+	results$weight <- exp(-0.5*results$d_aic) / (sum(exp(-0.5*results$d_aic)))
+
+	# Adjust p-value for multiple testing
 	results$p_adj <- p.adjust(results$p_value, method = "BY") # adjust p_value for multiple testing
+
+
 	rownames(results) <- 1:nrow(results)
 
 	message("Done !")
+
+	message(unique(warns))
 
 	return(results)
 
@@ -555,6 +620,7 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 	out$date <- as.Date(out$date, origin = "1970-01-01")
 	out$start <- as.Date(out$start, origin = "1970-01-01")
 	out$end   <- as.Date(out$end,   origin = "1970-01-01")
+	#out$interval <- out$end - out$start # might be used for plots
 
 
 	# Console messages
