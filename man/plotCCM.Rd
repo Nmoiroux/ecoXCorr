@@ -6,7 +6,7 @@
 \usage{
 plotCCM(
   data,
-  model_outcome = c("r2sign", "r2", "d_aic", "betas"),
+  model_outcome = c("d_aic", "R2sign", "R2", "betas", "weight"),
   threshold_p = 1
 )
 }
@@ -17,11 +17,11 @@ at least the columns \code{lag_start}, \code{lag_end}, \code{r2},
 
 \item{model_outcome}{Character string specifying the model's outcomes to plot. Either:
 \itemize{
-  \item \code{"r2sign"} for the signed coefficient of determination (default),
+  \item \code{"d_aic"} for the delta AIC (compared to the null model) (default),
+  \item \code{"R2sign"} for the signed coefficient of determination,
   computed as the marginal or classical \eqn{R^2} multiplied by the sign of the estimated effect,
-  \item \code{"r2"} for the coefficient of determination (\eqn{R^2}),
-  \item \code{"d_aic"} for the delta AIC (compared to the null model) or,
-  \item \code{"betas"} for the estimated beta parameter of the linear predictor.
+  \item \code{"R2"} for the coefficient of determination (\eqn{R^2}) or,
+  \item \code{"betas"} for the estimated beta parameter (slope) of the linear predictor.
   }}
 
 \item{threshold_p}{Numeric value giving the p-value threshold above which
@@ -77,8 +77,8 @@ random     = "",
 family     = "poisson"
 )
 
-plotCCM(res_glm, model_outcome = "r2sign", threshold_p = 0.05)
-plotCCM(res_glm, model_outcome = "r2")
+plotCCM(res_glm, model_outcome = "R2sign", threshold_p = 0.05)
+plotCCM(res_glm, model_outcome = "R2")
 plotCCM(res_glm, model_outcome = "d_aic")
 plotCCM(res_glm, model_outcome = "betas", threshold_p = 0.05)
 

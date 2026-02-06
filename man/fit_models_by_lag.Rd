@@ -9,7 +9,7 @@ fit_models_by_lag(
   response,
   predictors,
   random = "",
-  family = gaussian(),
+  family = "gaussian",
   min_n = 10,
   track = F,
   ...
@@ -26,9 +26,9 @@ the predictor variable(s) and optional random-effect variables.}
 a single predictor is supported; providing more than one predictor
 will result in an error.}
 
-\item{random}{Optional character string specifying random-effects terms
-to be added to the model formula (without a leading \code{+}), e.g.
-\code{"(1 | site/year)"} or \code{"(1 | site) + (1 | year)"} (\code{?glmmTMB::glmmTMB}).
+\item{random}{Optional character string specifying random-effects terms or
+covariance structure to be added to the model formula (without a leading \code{+}), e.g.
+\code{"(1 | site/year)"}, \code{"(1 | site) + (1 | year)"} or \code{"ar1(times + 0 | group)"} (\code{?glmmTMB::glmmTMB}).
 If empty (default), a fixed-effect model is fitted (using \code{glm()}.}
 
 \item{family}{Character string. The name of a family function
@@ -48,8 +48,9 @@ A data frame with one row per lag window, containing:
   \describe{
     \item{lag_start}{Start lag index of the aggregation window.}
     \item{lag_end}{End lag index of the aggregation window.}
+    \item{response}{Name of the response variable.}
     \item{predictor}{Name of the predictor variable.}
-    \item{r2}{Coefficient of determination (marginal \eqn{R^2} for mixed models).}
+    \item{R2...}{Coefficient of determination (marginal \eqn{R^2} for mixed models).}
     \item{betas}{Estimated beta parameter of the linear predictor.}
     \item{sign}{Sign of the estimated predictor effect (-1 or +1).}
     \item{d_aic}{AIC reduction compared to the null model.}
@@ -68,14 +69,16 @@ for the specified predictor.
 }
 \details{
 Both fixed-effect and mixed-effect models are supported.
-The modelling function used depends on the \code{random} arguments:
+
+The modelling function used depends on the \code{random} and \code{family} arguments:
 \itemize{
-  \item \code{random = ""}:  \code{\link[stats]{glm}}
-  \item \code{random != ""}: \code{\link[glmmTMB]{glmmTMB}}
+  \item \code{random} is not specified (default):  \code{\link[stats]{glm}}
+  \item \code{random} is note an empty string OR \code{family} is a valid glmmTMB family: \code{\link[glmmTMB]{glmmTMB}}
 }
 
 For mixed-effects models, marginal \eqn{R^2} (Nakagawa) is returned. For fixed-effects
-models, classical \eqn{R^2} is used.
+models, appropriate \eqn{R^2} is used (see \code{?performance::r2()}).
+Depending on model specification (depending on \code{random} and/or \code{family}), \eqn{R^2} for \code{\link[glmmTMB]{glmmTMB}} models may not be computed: the returned error or warning is printed in the console.
 
 
 For each unique combination of \code{lag_start} and \code{lag_end}, the
@@ -87,7 +90,7 @@ function:
   \item Extracts beta parameter of the linear predictor,
   \item Extracts the p-value of the predictor effect,
   \item Computes AIC for the specified and null models,
-  \item Computes the model \eqn{R^2} (marginal \eqn{R^2} for mixed models),
+  \item Computes the appropriate model\eqn{R^2} (marginal Nakagawa \eqn{R^2} for mixed models),
   \item Records the sign of the estimated effect and the sample size,
   \item Computes adjusted p-value using the False Discovery Rate method [Ref Benjamini and Yekutieli]
 }
