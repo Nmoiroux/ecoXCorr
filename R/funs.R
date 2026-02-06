@@ -88,7 +88,7 @@ plotCCM <- function(data,
   }
 
   # filter data according to p-value
-	data[data$p_adj>=threshold_p, indicator] <- NA
+	data[data$p_adj>threshold_p, indicator] <- NA
 
 	# find max absolute indicator
 	abs_ind <- abs(data[indicator]) # find max absolute of value(s) of indicator
