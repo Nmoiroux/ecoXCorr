@@ -1,6 +1,6 @@
 # ecoXCorr
 
-**ecoXCorr** ("Eco-Cross-Corr") is an R package designed to explore **lagged associations between environmental time series and ecological or epidemiological responses**.  
+**ecoXCorr** ("Eco-Cross-Corr") is an R package designed to explore **lagged associations between environmental time series and ecological or epidemiological responses** based on the method proposed by Curriero *et al.* (2005)[1].  
 
 It provides a coherent workflow to:
 
@@ -10,7 +10,7 @@ It provides a coherent workflow to:
 
 The package is particularly suited for studying **delayed environmental effects**, such as the influence of meteorological conditions on insect abundance or disease dynamics.
 
-`ecoXCorr` has less features than amazing `climwin` package. However, because `ecoXCorr` use `glmmTMB`, it can fit (mixed-)models using a large variety of error distribution (including negative-binomial, zero-inflated, zero-truncated... see `?glmmTMB::family_glmmTMB`) and covariance structures (see `vignette(glmmTMB::covstruct)`). `ecoXCorr` is also more flexible for interval lengths allowing to specify interval in number of days, not restricted to standard time periods (e.g. "week" or "month") as in `climwin`. 
+`ecoXCorr` has less features than amazing `climwin` package. However, because `ecoXCorr` use `glmmTMB`, it can fit (generalized) linear (mixed-)models using a large variety of error distribution (including negative-binomial, zero-inflated, zero-truncated... see `?glmmTMB::family_glmmTMB`) and covariance structures (see `vignette(glmmTMB::covstruct)`). `ecoXCorr` is also more flexible for interval lengths allowing to specify interval in number of days, not restricted to standard time periods (e.g. "week" or "month") as in `climwin`. 
 
 Below is an exemple of figure computed using `ecoXCorr`.
 ![plot](/man/figures/Rplot.jpg)
@@ -53,11 +53,11 @@ library(ecoXCorr)
 
 # Meteorological daily time series
 ?meteoMPL2023
-data(meteoMPL2023)
+head(meteoMPL2023)
 
 # Response data: tiger mosquito collections
 ?albopictusMPL2023
-data(albopictusMPL2023)
+head(albopictusMPL2023)
 
 ```
 
@@ -126,7 +126,7 @@ res_glm <- fit_models_by_lag(
 ```r
 ?plotCCM
 
-plotCCM(res_glm, model_outcome ="r2sign", threshold_p = 0.2)
+plotCCM(res_glm, model_outcome ="R2sign", threshold_p = 0.2)
 ```
 Each tile represents a lag window, with colour indicating the signed R²
 (% of variance explained × direction). Non-significant associations (p>0.2) are masked.
@@ -134,7 +134,7 @@ Each tile represents a lag window, with colour indicating the signed R²
 Other outcomes can be plotted (R², AIC difference with the null model, beta parameters of the linear predictor):
 
 ```r
-plotCCM(res_glm, model_outcome = "r2")
+plotCCM(res_glm, model_outcome = "R2")
 plotCCM(res_glm, model_outcome = "d_aic")
 plotCCM(res_glm, model_outcome = "betas")
 ```
@@ -155,13 +155,13 @@ res_glmm <- fit_models_by_lag(
   random     = "(1|area/trap)",
   family     = "truncated_nbinom2")
 
-plotCCM(res_glmm, model_outcome ="r2sign", threshold_p = 0.2)
+plotCCM(res_glmm, model_outcome ="R2sign", threshold_p = 0.2)
 ```
 
-The modelling function used depends on the `random` arguments:
+The modelling function used depends on the `random` and `family` arguments:
 
-- `random = ""`:  `stats::glm()`
-- `random != ""`: `glmmTMB::glmmTMB()`
+- `random` is empty:  `stats::glm()`
+- `random` is specified OR `family` is a valid glmmTMB family: `glmmTMB::glmmTMB()`
 
 
 ## When should I use ecoXCorr?
