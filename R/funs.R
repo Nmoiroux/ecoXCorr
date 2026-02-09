@@ -655,9 +655,9 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 #'   sampling dates.
 #' @param date_col_meteo Name of the date column in \code{meteo_data}.
 #' @param date_col_resp Name of the date column in \code{response_data}.
-#' @param value_cols Character vector of meteorological variables to aggregate.
+#' @param value_cols Name of one meteorological variables to aggregate.
 #' @param response Name of the response variable.
-#' @param predictors Name of the aggregated predictor used in the models (one of `value_cols` with suffix "_sum", "_min", "_mean" or "_max").
+#' @param agg_fun Name (character string) of the aggregation function. Function must accept a numeric vector as first argument. Default to \code{"mean"}.
 #' @param lag_unit Length of the base lag interval (in days).
 #' @param max_lag Maximum number of lag intervals.
 #' @param random Optional random-effects structure (passed to
@@ -680,9 +680,9 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 #' response_data = albopictusMPL2023,
 #' date_col_meteo   = "date",
 #' date_col_resp    = "date",
-#' value_cols    = c("rain_sum", "temp_mean"),
+#' value_cols    = "rain_sum",
+#' agg_fun           = "mean",
 #' response      = "individualCount",
-#' predictors    = "rain_sum_sum",
 #' lag_unit      = 7,
 #' max_lag       = 8,
 #' random        = "(1|area/trap)",
@@ -697,17 +697,26 @@ ecoXCorr <- function(
     date_col_meteo   = "date",
     date_col_resp    = "date",
     value_cols,
+    agg_fun = "mean",
     response,
-    predictors,
     lag_unit = 1,
     max_lag,
     random = "",
     family = "gaussian",
-    funs = list(mean = mean, min = min, max = max, sum = sum),
     na.rm = TRUE,
     track = FALSE,
     ...
 ) {
+
+  ## --- Checks
+  stopifnot(length(value_cols)==1)
+  stopifnot(length(agg_fun)==1 & is.character(agg_fun)==T)
+
+  # create argument funs for `aggregate_lagged_intervals`
+  funs <- list()
+  funs[[1]] <- match.fun(agg_fun)
+  names(funs) <- agg_fun
+
 
   ## --- Reference dates
   sampling_dates <- unique(response_data[[date_col_resp]])
@@ -723,6 +732,12 @@ ecoXCorr <- function(
     funs       = funs,
     na.rm      = na.rm
   )
+
+  # predictors names
+  predictors <- paste0(value_cols,"_", agg_fun)
+
+  stopifnot(predictors %in% names(met_agg))
+
 
   ## --- Merge with response data
   merged_data <- merge(

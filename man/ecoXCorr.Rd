@@ -10,13 +10,12 @@ ecoXCorr(
   date_col_meteo = "date",
   date_col_resp = "date",
   value_cols,
+  agg_fun = "mean",
   response,
-  predictors,
   lag_unit = 1,
   max_lag,
   random = "",
   family = "gaussian",
-  funs = list(mean = mean, min = min, max = max, sum = sum),
   na.rm = TRUE,
   track = FALSE,
   ...
@@ -32,11 +31,11 @@ sampling dates.}
 
 \item{date_col_resp}{Name of the date column in \code{response_data}.}
 
-\item{value_cols}{Character vector of meteorological variables to aggregate.}
+\item{value_cols}{Name of one meteorological variables to aggregate.}
+
+\item{agg_fun}{Name (character string) of the aggregation function. Function must accept a numeric vector as first argument. Default to \code{"mean"}.}
 
 \item{response}{Name of the response variable.}
-
-\item{predictors}{Name of the aggregated predictor used in the models (one of `value_cols` with suffix "_sum", "_min", "_mean" or "_max").}
 
 \item{lag_unit}{Length of the base lag interval (in days).}
 
@@ -47,14 +46,14 @@ sampling dates.}
 
 \item{family}{Model family (GLM or glmmTMB).}
 
-\item{funs}{Aggregation functions passed to
-\code{aggregate_lagged_intervals}.}
-
 \item{na.rm}{Logical indicating whether NA values are removed before aggregation.}
 
 \item{track}{Logical; if TRUE, prints lag windows during model fitting.}
 
 \item{...}{Additional arguments passed to the model fitting function.}
+
+\item{funs}{Aggregation functions passed to
+\code{aggregate_lagged_intervals}.}
 }
 \value{
 A data frame with one row per lag window, containing:
@@ -119,9 +118,9 @@ meteo_data    = meteoMPL2023,
 response_data = albopictusMPL2023,
 date_col_meteo   = "date",
 date_col_resp    = "date",
-value_cols    = c("rain_sum", "temp_mean"),
+value_cols    = "rain_sum",
+agg_fun           = "mean",
 response      = "individualCount",
-predictors    = "rain_sum_sum",
 lag_unit      = 7,
 max_lag       = 8,
 random        = "(1|area/trap)",
