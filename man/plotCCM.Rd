@@ -20,8 +20,9 @@ at least the columns \code{lag_start}, \code{lag_end}, \code{r2},
   \item \code{"d_aic"} for the delta AIC (compared to the null model) (default),
   \item \code{"R2sign"} for the signed coefficient of determination,
   computed as the marginal or classical \eqn{R^2} multiplied by the sign of the estimated effect,
-  \item \code{"R2"} for the coefficient of determination (\eqn{R^2}) or,
-  \item \code{"betas"} for the estimated beta parameter (slope) of the linear predictor.
+  \item \code{"R2"} for the coefficient of determination (\eqn{R^2}),
+  \item \code{"betas"} for the estimated beta parameter (slope) of the linear predictor or,
+  \item \code{"weight"} for the Akaike weight.
   }}
 
 \item{threshold_p}{Numeric value giving the p-value threshold above which
@@ -34,7 +35,7 @@ A \code{ggplot2} object representing the cross-correlation map.
 }
 \description{
 This function visualises the strength and direction of associations between
-a response variable and a lagged predictor across multiple lag windows, using
+a response variable and a lagged predictor across multiple lag windows \insertCite{currieroCrossCorrelationMaps2005}{ecoXCorr}, using
 the output of \code{\link{fit_models_by_lag}}. The resulting plot is a
 two-dimensional "cross-correlation map", where each tile represents a
 lag window defined by \code{lag_start} and \code{lag_end}.
@@ -56,25 +57,15 @@ This function does not perform any modelling itself; it is intended solely
 for visualising results obtained from \code{\link{fit_models_by_lag}}.
 }
 \examples{
-sampling_dates <- unique(albopictusMPL2023$date)
-
-met_agg <- aggregate_lagged_intervals(
-data       = meteoMPL2023,
-date_col   = "date",
-value_cols = c("rain_sum", "temp_mean"),
-d          = sampling_dates,
-i          = 7,
-m          = 8
-)
-
-albo_lag <- merge(met_agg, albopictusMPL2023, by = "date", all = TRUE)
-
-res_glm <- fit_models_by_lag(
-data       = albo_lag,
-response   = "individualCount",
-predictors = "rain_sum_sum",
-random     = "",
-family     = "poisson"
+res_glm <- ecoXCorr(
+meteo_data    = meteoMPL2023,
+response_data = albopictusMPL2023,
+value_cols    = c("rain_sum"),
+response      = "individualCount",
+predictors    = "rain_sum_sum",
+lag_unit      = 7,
+max_lag       = 8,
+family        = "poisson"
 )
 
 plotCCM(res_glm, model_outcome = "R2sign", threshold_p = 0.05)
@@ -82,6 +73,9 @@ plotCCM(res_glm, model_outcome = "R2")
 plotCCM(res_glm, model_outcome = "d_aic")
 plotCCM(res_glm, model_outcome = "betas", threshold_p = 0.05)
 
+}
+\references{
+\insertAllCited{}
 }
 \seealso{
 \code{\link{fit_models_by_lag}}, \code{\link[ggplot2]{ggplot}}

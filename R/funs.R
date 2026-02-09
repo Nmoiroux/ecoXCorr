@@ -1,7 +1,7 @@
 #' Plot a cross-correlation map (CCM) from lagged regression results
 #'
 #' This function visualises the strength and direction of associations between
-#' a response variable and a lagged predictor across multiple lag windows, using
+#' a response variable and a lagged predictor across multiple lag windows \insertCite{currieroCrossCorrelationMaps2005}{ecoXCorr}, using
 #' the output of \code{\link{fit_models_by_lag}}. The resulting plot is a
 #' two-dimensional "cross-correlation map", where each tile represents a
 #' lag window defined by \code{lag_start} and \code{lag_end}.
@@ -20,8 +20,9 @@
 #'   \item \code{"d_aic"} for the delta AIC (compared to the null model) (default),
 #'   \item \code{"R2sign"} for the signed coefficient of determination,
 #'   computed as the marginal or classical \eqn{R^2} multiplied by the sign of the estimated effect,
-#'   \item \code{"R2"} for the coefficient of determination (\eqn{R^2}) or,
-#'   \item \code{"betas"} for the estimated beta parameter (slope) of the linear predictor.
+#'   \item \code{"R2"} for the coefficient of determination (\eqn{R^2}),
+#'   \item \code{"betas"} for the estimated beta parameter (slope) of the linear predictor or,
+#'   \item \code{"weight"} for the Akaike weight.
 #'   }
 #' @param threshold_p Numeric value giving the p-value threshold above which
 #'   associations are masked (set to \code{NA}) in the plot. Filtering is performed on
@@ -39,28 +40,21 @@
 #' This function does not perform any modelling itself; it is intended solely
 #' for visualising results obtained from \code{\link{fit_models_by_lag}}.
 #'
+#' @references
+#'  \insertAllCited{}
+#'
 #' @seealso \code{\link{fit_models_by_lag}}, \code{\link[ggplot2]{ggplot}}
 #'
 #' @examples
-#' sampling_dates <- unique(albopictusMPL2023$date)
-#'
-#' met_agg <- aggregate_lagged_intervals(
-#' data       = meteoMPL2023,
-#' date_col   = "date",
-#' value_cols = c("rain_sum", "temp_mean"),
-#' d          = sampling_dates,
-#' i          = 7,
-#' m          = 8
-#' )
-#'
-#' albo_lag <- merge(met_agg, albopictusMPL2023, by = "date", all = TRUE)
-#'
-#' res_glm <- fit_models_by_lag(
-#' data       = albo_lag,
-#' response   = "individualCount",
-#' predictors = "rain_sum_sum",
-#' random     = "",
-#' family     = "poisson"
+#' res_glm <- ecoXCorr(
+#' meteo_data    = meteoMPL2023,
+#' response_data = albopictusMPL2023,
+#' value_cols    = c("rain_sum"),
+#' response      = "individualCount",
+#' predictors    = "rain_sum_sum",
+#' lag_unit      = 7,
+#' max_lag       = 8,
+#' family        = "poisson"
 #' )
 #'
 #' plotCCM(res_glm, model_outcome = "R2sign", threshold_p = 0.05)
@@ -141,7 +135,7 @@ plotCCM <- function(data,
 #' defined by the \code{lag_start} and \code{lag_end} columns of the input
 #' data frame. For each lag window, the model is fitted using
 #' observations corresponding to different reference dates (\code{date}),
-#' and summary statistics (betas, sign of effect, \eqn{R^2}, AIC reduction, sample size, p-value, p-value adjusted for multiple testing) are returned
+#' and summary statistics (betas, sign of effect, \eqn{R^2}, delta AIC, Akaike weight, sample size, p-value, p-value adjusted for multiple testing) are returned
 #' for the specified predictor.
 #'
 #' Both fixed-effect and mixed-effect models are supported.
@@ -195,7 +189,8 @@ plotCCM <- function(data,
 #'   \item Computes AIC for the specified and null models,
 #'   \item Computes the appropriate model\eqn{R^2} (marginal Nakagawa \eqn{R^2} for mixed models),
 #'   \item Records the sign of the estimated effect and the sample size,
-#'   \item Computes adjusted p-value using the False Discovery Rate method [Ref Benjamini and Yekutieli]
+#'   \item Computes delta-AIC and Akaike weight of each model \insertCite{vandepolIdentifyingBestClimatic2016}{ecoXCorr},
+#'   \item Computes adjusted p-value using the False Discovery Rate method \insertCite{benjaminiControlFalseDiscovery2001}{ecoXCorr}
 #' }
 #'
 #' The returned table is suitable for lag-window screening, heatmap
@@ -214,8 +209,12 @@ plotCCM <- function(data,
 #'     \item{d_aic}{AIC reduction compared to the null model.}
 #'     \item{n}{Number of observations used to fit the model.}
 #'     \item{p_value}{P-value associated with the predictor effect.}
+#'     \item{weight}{Akaike weight.}
 #'     \item{p_adj}{P-value adjusted for multiple testing.}
 #'   }
+#'
+#' @references
+#'  \insertAllCited{}
 #'
 #' @seealso
 #' \code{\link[glmmTMB]{glmmTMB}},
@@ -658,7 +657,7 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 #' @param date_col_resp Name of the date column in \code{response_data}.
 #' @param value_cols Character vector of meteorological variables to aggregate.
 #' @param response Name of the response variable.
-#' @param predictors Name of the aggregated predictor used in the models.
+#' @param predictors Name of the aggregated predictor used in the models (one of `value_cols` with suffix "_sum", "_min", "_mean" or "_max").
 #' @param lag_unit Length of the base lag interval (in days).
 #' @param max_lag Maximum number of lag intervals.
 #' @param random Optional random-effects structure (passed to
@@ -670,13 +669,17 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 #' @param track Logical; if TRUE, prints lag windows during model fitting.
 #' @param ... Additional arguments passed to the model fitting function.
 #'
+#' @inherit fit_models_by_lag details
 #' @inherit fit_models_by_lag return
+#' @inherit fit_models_by_lag references
 #'
 #'
 #' @examples
 #' res_glmm <- ecoXCorr(
 #' meteo_data    = meteoMPL2023,
 #' response_data = albopictusMPL2023,
+#' date_col_meteo   = "date",
+#' date_col_resp    = "date",
 #' value_cols    = c("rain_sum", "temp_mean"),
 #' response      = "individualCount",
 #' predictors    = "rain_sum_sum",

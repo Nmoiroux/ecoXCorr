@@ -56,6 +56,7 @@ A data frame with one row per lag window, containing:
     \item{d_aic}{AIC reduction compared to the null model.}
     \item{n}{Number of observations used to fit the model.}
     \item{p_value}{P-value associated with the predictor effect.}
+    \item{weight}{Akaike weight.}
     \item{p_adj}{P-value adjusted for multiple testing.}
   }
 }
@@ -64,7 +65,7 @@ This function fits a regression model separately for each lag window
 defined by the \code{lag_start} and \code{lag_end} columns of the input
 data frame. For each lag window, the model is fitted using
 observations corresponding to different reference dates (\code{date}),
-and summary statistics (betas, sign of effect, \eqn{R^2}, AIC reduction, sample size, p-value, p-value adjusted for multiple testing) are returned
+and summary statistics (betas, sign of effect, \eqn{R^2}, delta AIC, Akaike weight, sample size, p-value, p-value adjusted for multiple testing) are returned
 for the specified predictor.
 }
 \details{
@@ -92,7 +93,8 @@ function:
   \item Computes AIC for the specified and null models,
   \item Computes the appropriate model\eqn{R^2} (marginal Nakagawa \eqn{R^2} for mixed models),
   \item Records the sign of the estimated effect and the sample size,
-  \item Computes adjusted p-value using the False Discovery Rate method [Ref Benjamini and Yekutieli]
+  \item Computes delta-AIC and Akaike weight of each model \insertCite{vandepolIdentifyingBestClimatic2016}{ecoXCorr},
+  \item Computes adjusted p-value using the False Discovery Rate method \insertCite{benjaminiControlFalseDiscovery2001}{ecoXCorr}
 }
 
 The returned table is suitable for lag-window screening, heatmap
@@ -123,6 +125,9 @@ family     = "poisson"
 
 head(res_glm)
 
+}
+\references{
+\insertAllCited{}
 }
 \seealso{
 \code{\link[glmmTMB]{glmmTMB}},
