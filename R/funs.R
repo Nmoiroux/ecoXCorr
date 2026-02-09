@@ -681,13 +681,14 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 #' date_col_meteo   = "date",
 #' date_col_resp    = "date",
 #' value_cols    = "rain_sum",
-#' agg_fun           = "mean",
+#' agg_fun       = "sum",
 #' response      = "individualCount",
 #' lag_unit      = 7,
 #' max_lag       = 8,
 #' random        = "(1|area/trap)",
 #' family        = "nbinom2"
 #' )
+#'
 #' head(res_glmm)
 #'
 #' @export
