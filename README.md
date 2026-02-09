@@ -125,6 +125,11 @@ res_glm <- fit_models_by_lag(
 
 ### One-step approach using the `ecoXCorr()` wrapper function:
 
+This approach is probably better if a short number of variable is of interest and to avoid mistakes when it comes to merge lagged meteorological dataset to response dataset.
+
+Here, aggregation is performed for only one variable in the meteo dataset (argument `value_cols`) according to one function (`agg_fun`) resulting in one variable to be used as the predictor in the modeling process. 
+
+
 ```r
 ?ecoXCorr()
 
