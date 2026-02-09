@@ -384,6 +384,7 @@ fit_models_by_lag <- function(data,
 		aic_null <- performance_aic(fit_null)
 		d_aic <- aic - aic_null
 
+
 		# fill results dataframe
 		results[[k]] <- data.frame(
 			lag_start = ls,
@@ -642,4 +643,104 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 	out
 }
 
+#' Run a complete ecoXCorr analysis: aggregation + lagged modelling
+#'
+#' This wrapper function combines \code{\link{aggregate_lagged_intervals}}
+#' and \code{\link{fit_models_by_lag}} into a single workflow. It aggregates
+#' environmental predictors over multiple lag windows relative to sampling
+#' dates, merges them with a response dataset, and fits regression models
+#' separately for each lag window.
+#'
+#' @param meteo_data Data frame containing meteorological time series.
+#' @param response_data Data frame containing the response variable and
+#'   sampling dates.
+#' @param date_col_meteo Name of the date column in \code{meteo_data}.
+#' @param date_col_resp Name of the date column in \code{response_data}.
+#' @param value_cols Character vector of meteorological variables to aggregate.
+#' @param response Name of the response variable.
+#' @param predictors Name of the aggregated predictor used in the models.
+#' @param lag_unit Length of the base lag interval (in days).
+#' @param max_lag Maximum number of lag intervals.
+#' @param random Optional random-effects structure (passed to
+#'   \code{fit_models_by_lag}).
+#' @param family Model family (GLM or glmmTMB).
+#' @param funs Aggregation functions passed to
+#'   \code{aggregate_lagged_intervals}.
+#' @param na.rm Logical indicating whether NA values are removed before aggregation.
+#' @param track Logical; if TRUE, prints lag windows during model fitting.
+#' @param ... Additional arguments passed to the model fitting function.
+#'
+#' @inherit fit_models_by_lag return
+#'
+#'
+#' @examples
+#' res_glmm <- ecoXCorr(
+#' meteo_data    = meteoMPL2023,
+#' response_data = albopictusMPL2023,
+#' value_cols    = c("rain_sum", "temp_mean"),
+#' response      = "individualCount",
+#' predictors    = "rain_sum_sum",
+#' lag_unit      = 7,
+#' max_lag       = 8,
+#' random        = "(1|area/trap)",
+#' family        = "nbinom2"
+#' )
+#' head(res_glmm)
+#'
+#' @export
+ecoXCorr <- function(
+    meteo_data,
+    response_data,
+    date_col_meteo   = "date",
+    date_col_resp    = "date",
+    value_cols,
+    response,
+    predictors,
+    lag_unit = 1,
+    max_lag,
+    random = "",
+    family = "gaussian",
+    funs = list(mean = mean, min = min, max = max, sum = sum),
+    na.rm = TRUE,
+    track = FALSE,
+    ...
+) {
+
+  ## --- Reference dates
+  sampling_dates <- unique(response_data[[date_col_resp]])
+
+  ## --- Aggregate lagged predictors
+  met_agg <- aggregate_lagged_intervals(
+    data       = meteo_data,
+    date_col   = date_col_meteo,
+    value_cols = value_cols,
+    d          = sampling_dates,
+    i          = lag_unit,
+    m          = max_lag,
+    funs       = funs,
+    na.rm      = na.rm
+  )
+
+  ## --- Merge with response data
+  merged_data <- merge(
+    met_agg,
+    response_data,
+    by.x = "date",
+    by.y = date_col_resp,
+    all  = TRUE
+  )
+
+  ## --- Fit models by lag window
+  res <- fit_models_by_lag(
+    data       = merged_data,
+    response   = response,
+    predictors = predictors,
+    random     = random,
+    family     = family,
+    track      = track,
+    ...
+  )
+
+  res
+}
 
