@@ -2,7 +2,6 @@
 % Please edit documentation in R/ecoXCorr-package.R
 \docType{package}
 \name{ecoXCorr-package}
-\alias{ecoXCorr}
 \alias{ecoXCorr-package}
 \title{ecoXCorr: Lagged Cross-Correlation Analysis of Environmental Time Series}
 \description{

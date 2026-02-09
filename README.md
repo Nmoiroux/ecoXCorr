@@ -40,6 +40,8 @@ The typical workflow in **ecoXCorr** follows three steps with respective functio
 3. **Visualisation using cross-correlation maps**  
    `plotCCM()`
 
+Steps 1 and 2 can be merged into a single step using the `ecoXCorr()` wrapper function.
+
 The package ships with two example datasets to illustrate this workflow:
 
 - `meteoMPL2023`: daily meteorological data (Montpellier, France, 2023)
@@ -121,6 +123,25 @@ res_glm <- fit_models_by_lag(
 
 ```
 
+### One-step approach using the `ecoXCorr()` wrapper function:
+
+```r
+?ecoXCorr()
+
+res_glm <- ecoXCorr(
+  meteo_data    = meteoMPL2023,
+  response_data = albopictusMPL2023,
+  date_col_meteo = "date",
+  date_col_resp = "date",
+  value_cols    = c("rain_sum", "temp_mean"),
+  response      = "individualCount",
+  predictors    = "temp_mean_mean",
+  lag_unit      = 7,
+  max_lag       = 8,
+  family        = "poisson"
+)
+```
+ 
 ### Visualise results as cross-correlation maps
 
 ```r
