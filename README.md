@@ -133,9 +133,9 @@ res_glm <- ecoXCorr(
   response_data = albopictusMPL2023,
   date_col_meteo = "date",
   date_col_resp = "date",
-  value_cols    = c("rain_sum", "temp_mean"),
+  value_cols    = "rain_sum",
+  agg_fun       = "sum",
   response      = "individualCount",
-  predictors    = "temp_mean_mean",
   lag_unit      = 7,
   max_lag       = 8,
   family        = "poisson"
