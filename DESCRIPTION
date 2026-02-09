@@ -28,7 +28,9 @@ Imports:
     glmmTMB,
     ggplot2,
     stats,
-    performance
+    performance,
+    Rdpack
+RdMacros: Rdpack
 Depends: 
     R (>= 3.5)
 URL: https://github.com/Nmoiroux/ecoXCorr
