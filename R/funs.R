@@ -773,7 +773,7 @@ ecoXCorr <- function(
 #' @export
 ecoXCorrApp <- function() {
   runApp(
-    system.file("shiny/ecoXCorrApp.R", package = "ecoXCorr"),
+    system.file("shiny/app.R", package = "ecoXCorr"),
     launch.browser = TRUE
   )
 }
