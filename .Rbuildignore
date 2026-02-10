@@ -1,5 +1,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^data-raw$
-^inst\extdata$
 ^\.github$
+^0004826-260129131611470\.csv$
+^synop_2023\.csv$
+^\.gitignore$
+^rsconnect
