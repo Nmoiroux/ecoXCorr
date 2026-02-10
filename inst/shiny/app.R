@@ -102,9 +102,9 @@ ui <- fluidPage(
       tabsetPanel(
         tabPanel("Cross-correlation map",
                  plotOutput("ccm_plot", height = "600px")),
-        tabPanel("Messages",
-                 verbatimTextOutput("messages")),
-        tabPanel("Results table",
+        tabPanel("Description",
+                 textOutput("messages")),
+        tabPanel("Results table (preview)",
                  tableOutput("results_head"))
       )
     )
@@ -193,7 +193,7 @@ server <- function(input, output, session) {
     }
 
 
-    head(res[order(res[[ord]], decreasing = TRUE), ])
+    head(res[order(abs(res[[ord]]), decreasing = TRUE), ])
   })
 }
 
