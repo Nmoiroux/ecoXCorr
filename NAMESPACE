@@ -2,6 +2,7 @@
 
 export(aggregate_lagged_intervals)
 export(ecoXCorr)
+export(ecoXCorrApp)
 export(fit_models_by_lag)
 export(plotCCM)
 importFrom(Rdpack,reprompt)

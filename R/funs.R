@@ -71,15 +71,11 @@ plotCCM <- function(data,
   indicator <- model_outcome
 
   # get R2 name from data
-  R2_type <- names(data)[which(grepl('^R2',names(data))==TRUE)]
+  R2_type <- names(data)[which(grepl('^R2(?!s)',names(data), perl=TRUE) ==TRUE)]
   if (indicator == "R2"){
     indicator <- R2_type
   }
 
-  # compute signed R2
-  if (indicator == "R2sign"){
-    data$R2sign <- data$sign * data[,R2_type]
-  }
 
   # filter data according to p-value
 	data[data$p_adj>threshold_p, indicator] <- NA
@@ -377,6 +373,9 @@ fit_models_by_lag <- function(data,
 		  r2 <- NA
 		}
 
+		# compute R2sign
+		R2sign <- unlist(r2) * sign
+
 
 		# compute delta AIC
 		aic <- performance_aic(fit)
@@ -391,6 +390,7 @@ fit_models_by_lag <- function(data,
 			response  = response,
 			predictor = predictors[1],
 			R2        = r2,
+			R2sign    = R2sign,
 			betas     = betas,
 			sign      = sign,
 			d_aic     = d_aic,
@@ -763,3 +763,17 @@ ecoXCorr <- function(
   res
 }
 
+#' Launch the ecoXCorr Shiny application
+#'
+#' This function launches an interactive Shiny application allowing users
+#' to run a complete ecoXCorr workflow (aggregation, lagged modelling and
+#' visualisation) using either example datasets included in the package
+#' or user-provided data.
+#'
+#' @export
+ecoXCorrApp <- function() {
+  runApp(
+    system.file("shiny/ecoXCorrApp.R", package = "ecoXCorr"),
+    launch.browser = TRUE
+  )
+}

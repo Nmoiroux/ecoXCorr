@@ -29,7 +29,9 @@ Imports:
     ggplot2,
     stats,
     performance,
-    Rdpack
+    Rdpack,
+    shiny,
+    readr
 RdMacros: Rdpack
 Depends: 
     R (>= 3.5)
