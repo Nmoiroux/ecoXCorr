@@ -100,12 +100,25 @@ ui <- fluidPage(
 
     mainPanel(
       tabsetPanel(
-        tabPanel("Cross-correlation map",
+        tabPanel("Cross-Correlation Map",
                  plotOutput("ccm_plot", height = "600px")),
-        tabPanel("Description",
+        tabPanel("Figure description",
                  textOutput("messages")),
         tabPanel("Results table (preview)",
-                 tableOutput("results_head"))
+                 tableOutput("results_head")),
+        tabPanel("R Code", verbatimTextOutput("rcode")),
+        tabPanel("About", value = "panel4", # Tab About----
+                 h3("About"),
+                 tags$p("This shiny app is a friendly GUI for the ecoXCross package : Moiroux (1,2), Nicolas, Colombine Bartholomee (1), and Paul Taconet (1). ecoXCorr: An R Package to Explore Lagged Associations between Environmental Time Series and Ecological Responses. R. 2 February 2026, released 10 February 2026. https://github.com/Nmoiroux/ecoXCorr. .
+"),
+                 tags$p("(1) MIVEGEC, Univ. Montpellier, IRD, CNRS, Montpellier, France ; (2) Pôle de zoologie médicale, Institut Pasteur de Dakar, Sénégal"),
+
+                 h4("References"),
+                 tags$p("Curriero, Frank C., Scott M. Shone, and Gregory E. Glass. ‘Cross Correlation Maps: A Tool for Visualizing and Modeling Time Lagged Associations’. Vector Borne and Zoonotic Diseases (Larchmont, N.Y.) 5, no. 3 (2005): 267–75. https://doi.org/10.1089/vbz.2005.5.267.\n
+Pol, Martijn van de, Liam D. Bailey, Nina McLean, Laurie Rijsdijk, Callum R. Lawson, and Lyanne Brouwer. ‘Identifying the Best Climatic Predictors in Ecology and Evolution’. Methods in Ecology and Evolution 7, no. 10 (2016): 1246–57. https://doi.org/10.1111/2041-210X.12590."),
+
+                 h4("Aknowledgements"),
+                 tags$p("ANR project DIV-YOO (Diversity of mosquitoes in West Africa)"))
       )
     )
   )
@@ -194,6 +207,32 @@ server <- function(input, output, session) {
 
 
     head(res[order(abs(res[[ord]]), decreasing = TRUE), ])
+  })
+
+  # R code ----------------------------------------------------------
+  output$rcode <- renderText({
+    paste(
+      "# Code used\n",
+      "# install.packages(\"devtools\")",
+      "# devtools::install_github(\"Nmoiroux/ecoXCorr\")\n",
+      "library(ecoXCorr)\n",
+      "results <- ecoXCorr(",
+      "  meteo_data     = meteo_data,",
+      "  response_data  = response_data,",
+      sprintf("  date_col_meteo = %s,", input$date_meteo),
+      sprintf("  date_col_resp  = %s,", input$date_resp),
+      sprintf("  value_cols     = %s,", input$value_cols),
+      sprintf("  agg_fun        = %s,", input$agg_fun),
+      sprintf("  response       = %s,", input$response),
+      sprintf("  lag_unit       = %d,", input$lag_unit),
+      sprintf("  max_lag        = %d,", input$max_lag),
+      sprintf("  random         = %s,", input$random),
+      sprintf("  family         = %s", input$family),")\n",
+      "plotCCM(results,",
+      sprintf("  model_outcome = %s,", input$model_outcome),
+      sprintf("  threshold_p   = %.2f,", input$threshold_p),")",
+      sep = "\n"
+    )
   })
 }
 
