@@ -1,0 +1,8 @@
+bibentry(
+  bibtype = "Manual",
+  title = "ecoXCross: An R Package for lagged cross-correlation analysis of environmental time series",
+  author = "Nicolas Moiroux, Colombine Bartholomée, Paul Taconet",
+  year = 2026,
+  note = "R package version 0.1.4",
+  doi = "10.5281/zenodo.18600567"
+)
