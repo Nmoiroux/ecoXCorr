@@ -60,9 +60,11 @@ for visualising results obtained from \code{\link{fit_models_by_lag}}.
 res_glm <- ecoXCorr(
 meteo_data    = meteoMPL2023,
 response_data = albopictusMPL2023,
-value_cols    = c("rain_sum"),
+date_col_meteo   = "date",
+date_col_resp    = "date",
+value_cols    = "rain_sum",
+agg_fun       = "sum",
 response      = "individualCount",
-predictors    = "rain_sum_sum",
 lag_unit      = 7,
 max_lag       = 8,
 family        = "poisson"

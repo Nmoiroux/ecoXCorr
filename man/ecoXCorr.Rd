@@ -51,9 +51,6 @@ sampling dates.}
 \item{track}{Logical; if TRUE, prints lag windows during model fitting.}
 
 \item{...}{Additional arguments passed to the model fitting function.}
-
-\item{funs}{Aggregation functions passed to
-\code{aggregate_lagged_intervals}.}
 }
 \value{
 A data frame with one row per lag window, containing:

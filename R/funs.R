@@ -49,9 +49,11 @@
 #' res_glm <- ecoXCorr(
 #' meteo_data    = meteoMPL2023,
 #' response_data = albopictusMPL2023,
-#' value_cols    = c("rain_sum"),
+#' date_col_meteo   = "date",
+#' date_col_resp    = "date",
+#' value_cols    = "rain_sum",
+#' agg_fun       = "sum",
 #' response      = "individualCount",
-#' predictors    = "rain_sum_sum",
 #' lag_unit      = 7,
 #' max_lag       = 8,
 #' family        = "poisson"
@@ -663,8 +665,6 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 #' @param random Optional random-effects structure (passed to
 #'   \code{fit_models_by_lag}).
 #' @param family Model family (GLM or glmmTMB).
-#' @param funs Aggregation functions passed to
-#'   \code{aggregate_lagged_intervals}.
 #' @param na.rm Logical indicating whether NA values are removed before aggregation.
 #' @param track Logical; if TRUE, prints lag windows during model fitting.
 #' @param ... Additional arguments passed to the model fitting function.

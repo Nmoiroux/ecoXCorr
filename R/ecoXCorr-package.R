@@ -32,6 +32,7 @@
 #' @importFrom performance r2
 #' @importFrom performance r2_nakagawa
 #' @importFrom Rdpack reprompt
+#' @importFrom shiny runApp
 #' @importFrom stats as.formula
 #' @importFrom stats binomial
 #' @importFrom stats Gamma
