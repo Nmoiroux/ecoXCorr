@@ -120,7 +120,9 @@ plotCCM <- function(data,
 	  theme_bw()
 
 	# message
-	message(paste0("Cross correlation maps showing ",model_outcome," for the lagged effect of ", unique(data$predictor) ," on ", unique(data$response),". Pink-bordered square highlight the time lag with the highest absolute ",model_outcome,". Grey squares show intervals whith adjusted (for multiple testing) p-values > ",threshold_p,"."))
+	message(paste0("Cross correlation maps showing ",model_outcome," of models fitted on ", unique(data$response)," with
+	               lagged effects of ", unique(data$predictor) ," as predictor. Pink-bordered square highlight the time lag with the highest absolute value of ",model_outcome,".
+	               Grey squares show intervals whith adjusted (for multiple testing) p-values > ",threshold_p,"."))
 
 	# return plot
 	return(plot)
