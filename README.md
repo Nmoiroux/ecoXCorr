@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/1147854443.svg)](https://doi.org/10.5281/zenodo.18600567)
+
 # ecoXCorr
 
 **ecoXCorr** (pronounce "*Eco-Cross-Corr*") is an R package designed to explore **lagged associations between environmental time series and ecological or epidemiological responses** based on the method proposed by Curriero *et al.* (2005)[1].  
