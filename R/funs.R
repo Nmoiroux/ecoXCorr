@@ -161,11 +161,11 @@ plotCCM <- function(data,
 #' @param random Optional character string specifying random-effects terms or
 #'   covariance structure to be added to the model formula (without a leading \code{+}), e.g.
 #'   \code{"(1 | site/year)"}, \code{"(1 | site) + (1 | year)"} or \code{"ar1(times + 0 | group)"} (\code{?glmmTMB::glmmTMB}).
-#'   If empty (default), a fixed-effect model is fitted (using \code{glm()}.
+#'   If empty (default), a fixed-effect model is fitted.
 #'
 #' @param family Character string. The name of a family function
 #'   to be used in GLM or GLMM models. Default to "gaussian" (Linear model).
-#'   see \code{?stats::family} and \code{?glmmTMB::family_glmmTMB}
+#'   see \code{?stats::family} and \code{?glmmTMB::family_glmmTMB} for valid family functions.
 #'
 #' @param min_n Minimum number of observations required to fit a model.
 #'   (Currently not enforced; retained for future extensions.)
