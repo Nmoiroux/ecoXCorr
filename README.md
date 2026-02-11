@@ -2,7 +2,7 @@
 
 # ecoXCorr
 
-**ecoXCorr** (pronounce "*Eco-Cross-Corr*") is an R package designed to explore **lagged associations between environmental time series and ecological or epidemiological responses** based on the method proposed by Curriero *et al.* (2005)[^1].  
+**ecoXCorr** (pronounce "*Eco-Cross-Corr*") is an R package designed to explore **lagged associations between environmental time series and ecological or epidemiological responses** based on the method proposed by Curriero *et al.* (2005)[[1]](#1).  
 
 It provides a coherent workflow to:
 
@@ -12,10 +12,10 @@ It provides a coherent workflow to:
 
 The package is particularly suited for studying **delayed environmental effects**, such as the influence of meteorological conditions on insect abundance or disease dynamics.
 
-`ecoXCorr` has similar features than amazing [`climwin`](https://cran.r-project.org/web/packages/climwin/index.html) package but use [`glmmTMB`](https://cran.r-project.org/web/packages/glmmTMB/index.html) allowing to fit (generalized) linear (mixed-)models using a large variety of error distribution (including negative-binomial, zero-inflated, zero-truncated... see [`?glmmTMB::family_glmmTMB`](https://glmmtmb.github.io/glmmTMB/reference/nbinom2.html)) and covariance structures (see [`vignette(glmmTMB::covstruct)`](https://glmmtmb.github.io/glmmTMB/articles/covstruct.html)). `ecoXCorr` is also more flexible for interval lengths allowing to specify interval in number of days, not restricted to standard time periods (e.g. "week" or "month") as in `climwin`. 
+`ecoXCorr` shares several features with excellent [`climwin`](https://cran.r-project.org/web/packages/climwin/index.html) [[2]](#2) package, but relies on [`glmmTMB`](https://cran.r-project.org/web/packages/glmmTMB/index.html), allowing to fit (generalized) linear mixed-models with a wide range of error distribution (including negative-binomial, zero-inflated, and zero-truncated; see [`?glmmTMB::family_glmmTMB`](https://glmmtmb.github.io/glmmTMB/reference/nbinom2.html)) as well as flexible covariance structures (see [`vignette(glmmTMB::covstruct)`](https://glmmtmb.github.io/glmmTMB/articles/covstruct.html)). The two packages also differ in their approach to multiple testing and error control. `climwin` addresses Type I error inflation through a simulation-based framework [[2]](#2), whereas `ecoXCorr` controls for multiple testing using false discovery rate (FDR) adjustment of p-values. In addition, `ecoXCorr` provides greater flexibility in defining lag intervals, as these can be specified directly in numbers of days rather than being restricted to predefined time units (e.g. “week” or “month”), as in `climwin`. Conversely, `climwin` supports additional modelling frameworks that are not implemented in ecoXCorr, including cox proportional hazard model, and weighted window models [[2]](#2).
 
 Below is an exemple of figure computed using `ecoXCorr`.
-![plot](/man/figures/Rplot.jpg)
+![plot](man/figures/Rplot.jpg)
 
 *Fig. 1: Cross correlation maps showing the lagged effect of rainfall on Ae. albopictus abundance. Time lags are expressed in days prior to sampling. The signed R² reflects the variance explained by the explanatory variable, multiplied by the sign of the estimated effect. Pink-bordered square highlight the time lag with the highest R². Grey squares represent correlations with adjusted (for multiple testing) p-values > 0.05.* 
 
@@ -159,7 +159,7 @@ plotCCM(res_glm, model_outcome ="R2sign", threshold_p = 0.2)
 Each tile represents a lag window, with colour indicating the signed R²
 (% of variance explained × direction). Non-significant associations (p>0.2) are masked.
 
-Other outcomes can be plotted (R², delta-AIC [2], Akaike weight [2], beta parameters of the linear predictor):
+Other outcomes can be plotted (R², delta-AIC [[3]](#3), Akaike weight [[3]](#3), beta parameters of the linear predictor):
 
 ```r
 plotCCM(res_glm, model_outcome = "R2")
@@ -202,7 +202,7 @@ ecoXCorr is useful when:
 
 Typical applications include:
 
-- variable and feature selection in modelling
+- variable and feature selection in modelling [[4]](#4)[[5]](#5)
 - vector ecology
 - disease ecology
 - environmental epidemiology
@@ -211,12 +211,17 @@ Typical applications include:
 
 ### References (Methods)
 
-[^1].  Curriero FC, Shone SM, Glass GE. (2005) Cross correlation maps: a tool for visualizing and modeling time lagged associations. *Vector Borne Zoonotic Dis.* [doi:10.1089/vbz.2005.5.267](https://doi.org/10.1089/vbz.2005.5.267)
-2.  van de Pol M, Bailey LD, McLean N, et al. (2016) Identifying the best climatic predictors in ecology and evolution. *Methods in Ecology and Evolution.* [doi:10.1111/2041-210X.12590](https://doi.org/10.1111/2041-210X.12590)
+<a id="1">[1]</a> Curriero FC, Shone SM, Glass GE. (2005) Cross correlation maps: a tool for visualizing and modeling time lagged associations. *Vector Borne Zoonotic Dis.* [doi:10.1089/vbz.2005.5.267](https://doi.org/10.1089/vbz.2005.5.267)
+
+<a id="2">[2]</a> van de Pol M, Bailey LD, McLean N, et al. (2016) Identifying the best climatic predictors in ecology and evolution. *Methods in Ecology and Evolution.* [doi:10.1111/2041-210X.12590](https://doi.org/10.1111/2041-210X.12590)
+
+<a id="3">[3]</a> Burnham, Kenneth P., and David R. Anderson, eds. Model Selection and Multimodel Inference. Springer, 2004. [https://doi.org/10.1007/b97636](https://doi.org/10.1007/b97636)
 
 ### References (Use examples)
-3.  Bartholomée C, Taconet P, Mercat M, Grail C, Bouhsira E, Fournet F, et al. Investigating the role of urban vegetation alongside other environmental variables in shaping Aedes albopictus presence and abundance in Montpellier, France. PLOS ONE. 2025;20: e0335793. [doi:10.1371/journal.pone.0335793](https://doi.org/10.1371/journal.pone.0335793)
-4.  Taconet P, Porciani A, Soma DD, Mouline K, Simard F, Koffi AA, et al. Data-driven and interpretable machine-learning modeling to explore the fine-scale environmental determinants of malaria vectors biting rates in rural Burkina Faso. Parasites & Vectors. 2021;14: 345. [doi:10.1186/s13071-021-04851-x](https://doi.org/10.1186/s13071-021-04851-x)
+
+<a id="4">[4]</a>  Bartholomée C, Taconet P, Mercat M, Grail C, Bouhsira E, Fournet F, et al. Investigating the role of urban vegetation alongside other environmental variables in shaping Aedes albopictus presence and abundance in Montpellier, France. PLOS ONE. 2025;20: e0335793. [doi:10.1371/journal.pone.0335793](https://doi.org/10.1371/journal.pone.0335793)
+
+<a id="5">[5]</a>  Taconet P, Porciani A, Soma DD, Mouline K, Simard F, Koffi AA, et al. Data-driven and interpretable machine-learning modeling to explore the fine-scale environmental determinants of malaria vectors biting rates in rural Burkina Faso. Parasites & Vectors. 2021;14: 345. [doi:10.1186/s13071-021-04851-x](https://doi.org/10.1186/s13071-021-04851-x)
 
 
 ### License 
