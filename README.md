@@ -12,7 +12,7 @@ It provides a coherent workflow to:
 
 The package is particularly suited for studying **delayed environmental effects**, such as the influence of meteorological conditions on insect abundance or disease dynamics.
 
-`ecoXCorr` has similar features than amazing [`climwin`](https://cran.r-project.org/web/packages/climwin/index.html) package. However, because `ecoXCorr` use `glmmTMB`, it can fit (generalized) linear (mixed-)models using a large variety of error distribution (including negative-binomial, zero-inflated, zero-truncated... see `?glmmTMB::family_glmmTMB`) and covariance structures (see `vignette(glmmTMB::covstruct)`). `ecoXCorr` is also more flexible for interval lengths allowing to specify interval in number of days, not restricted to standard time periods (e.g. "week" or "month") as in `climwin`. 
+`ecoXCorr` has similar features than amazing [`climwin`](https://cran.r-project.org/web/packages/climwin/index.html) package but use [`glmmTMB`](https://cran.r-project.org/web/packages/glmmTMB/index.html) allowing to fit (generalized) linear (mixed-)models using a large variety of error distribution (including negative-binomial, zero-inflated, zero-truncated... see [`?glmmTMB::family_glmmTMB`](https://glmmtmb.github.io/glmmTMB/reference/nbinom2.html)) and covariance structures (see [`vignette(glmmTMB::covstruct)`](https://glmmtmb.github.io/glmmTMB/articles/covstruct.html)). `ecoXCorr` is also more flexible for interval lengths allowing to specify interval in number of days, not restricted to standard time periods (e.g. "week" or "month") as in `climwin`. 
 
 Below is an exemple of figure computed using `ecoXCorr`.
 ![plot](/man/figures/Rplot.jpg)
