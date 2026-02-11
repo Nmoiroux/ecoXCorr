@@ -37,17 +37,16 @@ Each elementary lag block contains exactly \code{i} calendar days.
 All combinations of lag windows with \code{1 <= lag_end <= lag_start <= m}
 are evaluated.}
 
-\item{x}{Integer specifying how many most recent days (in reverse
-  chronological order) to exclude before the reference date \code{d} when
-  constructing lag windows.
+\item{x}{Integer specifying how many days the reference date \code{d}
+  should be shifted back in time when constructing lag windows.
 
-  When \code{x = 0}, lag intervals end exactly at and include the reference date
+  When \code{x = 0}, lag intervals can end exactly at and include the reference date
   \code{d}.
   When \code{x = 1}, the reference date itself is excluded and lag
   intervals end at \code{d - 1}.
-  More generally, lag windows end at \code{d - x}, so increasing
-  \code{x} shifts all lag intervals further back in time and excludes the
-  \code{x} most recent time units from the aggregation.
+  More generally, increasing
+  \code{x} shifts the reference date \code{d} back in time and excludes the
+  \code{x} most recent days from the aggregation.
 
   This parameter is useful when the predictor measured at or immediately
   before the sampling date should not contribute to the lagged summary.}
@@ -76,14 +75,14 @@ This function computes aggregated values of one or several meteorological
 time series over all possible lagged time intervals defined relative to one
 or more reference dates. For each reference date \code{d}, lag windows are
 constructed backward in time as
-\eqn{[d - x - k \times i + 1,\; d - x - (l - 1) \times i]},
-where \code{i} is the base interval length (in days), \code{m} is the maximum
-number of intervals considered, and \code{k, l} range from 1 to \code{m} with
-\code{k >= l}. The parameter \code{x} controls how many of the most recent
-days (including \code{d} when \code{x >= 1}) are excluded before
-constructing the lag windows.
+\eqn{[(d - x) - k \times i + 1,\; (d - x) - (l - 1) \times i]},
 }
 \details{
+where \code{x} shifts the reference date \code{d} back in time
+(excluding \code{d} when \code{x >= 1}), \code{i} is the base interval length (in days),
+\code{m} is the maximum number of intervals considered,
+and \code{k, l} range from 1 to \code{m} with \code{k >= l}.
+
 The function supports multiple reference dates, multiple variables, and
 multiple aggregation functions, and returns all combinations as additional
 columns in the output data frame.

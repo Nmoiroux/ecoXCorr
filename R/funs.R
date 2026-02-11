@@ -432,12 +432,12 @@ fit_models_by_lag <- function(data,
 #' time series over all possible lagged time intervals defined relative to one
 #' or more reference dates. For each reference date \code{d}, lag windows are
 #' constructed backward in time as
-#' \eqn{[d - x - k \times i + 1,\; d - x - (l - 1) \times i]},
-#' where \code{i} is the base interval length (in days), \code{m} is the maximum
-#' number of intervals considered, and \code{k, l} range from 1 to \code{m} with
-#' \code{k >= l}. The parameter \code{x} controls how many of the most recent
-#' days (including \code{d} when \code{x >= 1}) are excluded before
-#' constructing the lag windows.
+#' \eqn{[(d - x) - k \times i + 1,\; (d - x) - (l - 1) \times i]},
+#'
+#' where \code{x} shifts the reference date \code{d} back in time
+#' (excluding \code{d} when \code{x >= 1}), \code{i} is the base interval length (in days),
+#' \code{m} is the maximum number of intervals considered,
+#' and \code{k, l} range from 1 to \code{m} with \code{k >= l}.
 #'
 #' The function supports multiple reference dates, multiple variables, and
 #' multiple aggregation functions, and returns all combinations as additional
@@ -462,17 +462,16 @@ fit_models_by_lag <- function(data,
 #' @param m Integer giving the *maximum* lag (number of intervals) to consider.
 #'   All combinations of lag windows with \code{1 <= lag_end <= lag_start <= m}
 #'   are evaluated.
-#' @param x Integer specifying how many most recent days (in reverse
-#'   chronological order) to exclude before the reference date \code{d} when
-#'   constructing lag windows.
+#' @param x Integer specifying how many days the reference date \code{d}
+#'   should be shifted back in time when constructing lag windows.
 #'
-#'   When \code{x = 0}, lag intervals end exactly at and include the reference date
+#'   When \code{x = 0}, lag intervals can end exactly at and include the reference date
 #'   \code{d}.
 #'   When \code{x = 1}, the reference date itself is excluded and lag
 #'   intervals end at \code{d - 1}.
-#'   More generally, lag windows end at \code{d - x}, so increasing
-#'   \code{x} shifts all lag intervals further back in time and excludes the
-#'   \code{x} most recent time units from the aggregation.
+#'   More generally, increasing
+#'   \code{x} shifts the reference date \code{d} back in time and excludes the
+#'   \code{x} most recent days from the aggregation.
 #'
 #'   This parameter is useful when the predictor measured at or immediately
 #'   before the sampling date should not contribute to the lagged summary.
@@ -538,7 +537,7 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 	stopifnot(m >= 1, i >= 1)
 	stopifnot(i == as.integer(i)) # check if its an integer
 
-	d <- as.Date(d)
+	d <- as.Date(d) - x
 
 
 	# Time unit handling
@@ -563,10 +562,10 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 		k <- 1
 
 		for (end_lag in 1:m) {
-			end_date <- (dd - x) - (end_lag - 1) * step
+			end_date <- dd - (end_lag - 1) * step
 
 			for (start_lag in end_lag:m) {
-				start_date <- (dd - x) - start_lag * step + 1
+				start_date <- dd - start_lag * step + 1
 
 				intervals[[k]] <- data.frame(
 					date     = dd,
