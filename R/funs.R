@@ -466,7 +466,7 @@ fit_models_by_lag <- function(data,
 #'   chronological order) to exclude before the reference date \code{d} when
 #'   constructing lag windows.
 #'
-#'   When \code{x = 0}, lag intervals end exactly at the reference date
+#'   When \code{x = 0}, lag intervals end exactly at and include the reference date
 #'   \code{d}.
 #'   When \code{x = 1}, the reference date itself is excluded and lag
 #'   intervals end at \code{d - 1}.
