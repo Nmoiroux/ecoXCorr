@@ -49,6 +49,8 @@ The package ships with two example datasets to illustrate this workflow:
 - `meteoMPL2023`: daily meteorological data (Montpellier, France, 2023)
 - `albopictusMPL2023`: mosquito sampling data (*Aedes albopictus*, Montpellier, 2023)
 
+The package includes a user-friendly Shiny application: [`ecoXCorrApp`](https://nicolas-moiroux.shinyapps.io/ecoXCorrApp/).
+
 ## Example
 
 Load required packages and example data
