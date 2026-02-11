@@ -430,11 +430,14 @@ fit_models_by_lag <- function(data,
 #'
 #' This function computes aggregated values of one or several meteorological
 #' time series over all possible lagged time intervals defined relative to one
-#' or more reference dates. For each reference date \code{d}, all intervals
-#' \eqn{[d - k \times i,\; d - (l-1) \times i)} are generated,
-#' where \code{i} is the interval length (in days) and \code{k, l} range from 1 to \code{m} with
-#' \code{k >= l}. Each interval is then used to aggregate the specified
-#' meteorological variables using one or more summary functions.
+#' or more reference dates. For each reference date \code{d}, lag windows are
+#' constructed backward in time as
+#' \eqn{[d - x - k \times i + 1,\; d - x - (l - 1) \times i]},
+#' where \code{i} is the base interval length (in days), \code{m} is the maximum
+#' number of intervals considered, and \code{k, l} range from 1 to \code{m} with
+#' \code{k >= l}. The parameter \code{x} controls how many of the most recent
+#' time units (including \code{d} when \code{x >= 1}) are excluded before
+#' constructing the lag windows.
 #'
 #' The function supports multiple reference dates, multiple variables, and
 #' multiple aggregation functions, and returns all combinations as additional
@@ -452,12 +455,28 @@ fit_models_by_lag <- function(data,
 #'   to be aggregated (e.g. rainfall, temperature).
 #' @param d Vector of reference *dates*. Can be of class \code{Date} or coercible
 #'   to \code{Date}. Aggregations are computed independently for each date.
-#' @param i Integer giving the length of the base time *interval*, expressed in days
+#' @param i Integer giving the length of the base time *interval*, expressed in days.
+#'   Each elementary lag block contains exactly \code{i} calendar days.
 #'   (e.g. \code{1} for daily data, \code{7} for weekly intervals,
 #'   \code{14} for fortnightly intervals).
 #' @param m Integer giving the *maximum* lag (number of intervals) to consider.
 #'   All combinations of lag windows with \code{1 <= lag_end <= lag_start <= m}
 #'   are evaluated.
+#' @param x Integer specifying how many most recent time steps (in reverse
+#'   chronological order) to exclude before the reference date \code{d} when
+#'   constructing lag windows.
+#'
+#'   When \code{x = 0}, lag intervals end exactly at the reference date
+#'   \code{d}.
+#'   When \code{x = 1}, the reference date itself is excluded and lag
+#'   intervals end at \code{d - 1}.
+#'   More generally, lag windows end at \code{d - x}, so increasing
+#'   \code{x} shifts all lag intervals further back in time and excludes the
+#'   \code{x} most recent time units from the aggregation.
+#'
+#'   This parameter is useful when the predictor measured at or immediately
+#'   before the sampling date should not contribute to the lagged summary
+#'   (e.g. to avoid temporal overlap or reverse causation).
 #' @param funs Named list of aggregation functions to apply to each variable.
 #'   Each function must accept a numeric vector as first argument. The names
 #'   of the list are used to construct output column names
@@ -476,13 +495,14 @@ fit_models_by_lag <- function(data,
 #'   }
 #'
 #' @details
-#' Intervals are defined as left-closed and right-open
-#' (\code{[start, end)}). An interval is considered truncated if it extends
+#' Console messages are printed to inform the user of reference dates for which
+#' missing data or truncated intervals occurred.
+#'
+#' An interval is considered truncated if it extends
 #' beyond the temporal bounds of the input time series. An interval is considered
 #' missing if no observations fall within it.
 #'
-#' Console messages are printed to inform the user of reference dates for which
-#' missing data or truncated intervals occurred.
+
 #'
 #' @examples
 #' sampling_dates <- unique(albopictusMPL2023$date)
@@ -502,6 +522,7 @@ fit_models_by_lag <- function(data,
 aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 																			 i = 1, # integer, in days (7 for weekly intervals, 14 for fortnight, 30 for months...)
 																			 m,
+																			 x = 0,
 																			 funs = list(mean = mean,
 																			 						min = min,
 																			 						max  = max,
@@ -543,10 +564,10 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 		k <- 1
 
 		for (end_lag in 1:m) {
-			end_date <- dd - (end_lag - 1) * step
+			end_date <- (dd - x) - (end_lag - 1) * step
 
 			for (start_lag in end_lag:m) {
-				start_date <- dd - start_lag * step
+				start_date <- (dd - x) - start_lag * step + 1
 
 				intervals[[k]] <- data.frame(
 					date     = dd,
