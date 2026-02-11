@@ -54,7 +54,7 @@
 #' value_cols    = "rain_sum",
 #' agg_fun       = "sum",
 #' response      = "individualCount",
-#' lag_unit      = 7,
+#' interval      = 7,
 #' max_lag       = 8,
 #' family        = "poisson"
 #' )
