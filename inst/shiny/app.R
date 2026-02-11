@@ -109,16 +109,14 @@ ui <- fluidPage(
         tabPanel("R Code", verbatimTextOutput("rcode")),
         tabPanel("About", value = "panel4", # Tab About----
                  h3("About"),
-                 tags$p("This shiny app is a friendly GUI for the ecoXCross package : Moiroux (1,2), Nicolas, Colombine Bartholomee (1), and Paul Taconet (1). ecoXCorr: An R Package to Explore Lagged Associations between Environmental Time Series and Ecological Responses. R. 2 February 2026, released 10 February 2026. https://github.com/Nmoiroux/ecoXCorr. .
-"),
-                 tags$p("(1) MIVEGEC, Univ. Montpellier, IRD, CNRS, Montpellier, France ; (2) Pôle de zoologie médicale, Institut Pasteur de Dakar, Sénégal"),
+                 tags$p("This shiny app is a friendly GUI for the ecoXCross package : Moiroux Nicolas, Bartholomée Colombine, and Taconet Paul. 2006. ecoXCorr: An R Package to Explore Lagged Associations between Environmental Time Series and Ecological Responses. doi:10.5281/zenodo.18600567"),
+                  tags$a(href="https://github.com/Nmoiroux/ecoXCorr", "https://github.com/Nmoiroux/ecoXCorr"),
 
                  h4("References"),
-                 tags$p("Curriero, Frank C., Scott M. Shone, and Gregory E. Glass. ‘Cross Correlation Maps: A Tool for Visualizing and Modeling Time Lagged Associations’. Vector Borne and Zoonotic Diseases (Larchmont, N.Y.) 5, no. 3 (2005): 267–75. https://doi.org/10.1089/vbz.2005.5.267.\n
-Pol, Martijn van de, Liam D. Bailey, Nina McLean, Laurie Rijsdijk, Callum R. Lawson, and Lyanne Brouwer. ‘Identifying the Best Climatic Predictors in Ecology and Evolution’. Methods in Ecology and Evolution 7, no. 10 (2016): 1246–57. https://doi.org/10.1111/2041-210X.12590."),
+                 tags$p("Curriero, Frank C., Scott M. Shone, and Gregory E. Glass. ‘Cross Correlation Maps: A Tool for Visualizing and Modeling Time Lagged Associations’. Vector Borne and Zoonotic Diseases (Larchmont, N.Y.) 5, no. 3 (2005): 267–75. https://doi.org/10.1089/vbz.2005.5.267."),
+                 tags$p("Pol, Martijn van de, Liam D. Bailey, Nina McLean, Laurie Rijsdijk, Callum R. Lawson, and Lyanne Brouwer. ‘Identifying the Best Climatic Predictors in Ecology and Evolution’. Methods in Ecology and Evolution 7, no. 10 (2016): 1246–57. https://doi.org/10.1111/2041-210X.12590."),
 
-                 h4("Aknowledgements"),
-                 tags$p("ANR project DIV-YOO (Diversity of mosquitoes in West Africa)"))
+                 )
       )
     )
   )
