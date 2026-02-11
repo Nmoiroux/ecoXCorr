@@ -438,13 +438,13 @@ fit_models_by_lag <- function(data,
 #'   \code{data}. The column must be of class \code{Date} or \code{POSIXct}.
 #' @param value_cols Character vector giving the names of numeric variables
 #'   to be aggregated (e.g. rainfall, temperature).
-#' @param ref_date Vector of reference *dates* \code{d}. Can be of class \code{Date} or coercible
+#' @param ref_date Vector of reference dates \code{d}. Can be of class \code{Date} or coercible
 #'   to \code{Date}. Aggregations are computed independently for each date.
-#' @param interval Integer giving the length of the base time *interval* \code{i}, expressed in days.
+#' @param interval Integer giving the length of the base time interval \code{i}, expressed in days.
 #'   Each elementary lag block contains exactly \code{i} calendar days.
 #'   (e.g. \code{1} for daily data, \code{7} for weekly intervals,
 #'   \code{14} for fortnightly intervals).
-#' @param max_lag Integer giving the *maximum* lag (number of intervals) \code{m} to consider.
+#' @param max_lag Integer giving the maximum lag (number of intervals) \code{m} to consider.
 #'   All combinations of lag windows with \code{1 <= lag_end <= lag_start <= m}
 #'   are evaluated.
 #' @param shift Integer specifying how many days \code{x} the reference date \code{d}
