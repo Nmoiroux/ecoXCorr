@@ -79,8 +79,8 @@ For each reference date `d`, all intervals $[d - k \times i + 1; d - (l-1) \time
 where `i` is the interval length (in days) and `k, l` range from 1 to `m` with `k >= l`.
 
 
-In the example below `i` is set to 7 days, indicting that the unit for time intervals and lags will be a week.
-`m` is set to 8, indicating that the maximum lag (between response and predictor variables) considered will be
+In the example below `i` (`interval`) is set to 7 days, indicting that the unit for time intervals and lags will be a week.
+`m` (`max_lag`) is set to 8, indicating that the maximum lag (between response and predictor variables) considered will be
 8 weeks (or $m \times i$ days)
 
 ```r
@@ -94,9 +94,9 @@ met_agg <- aggregate_lagged_intervals(
   data       = meteoMPL2023,
   date_col   = "date",
   value_cols = c("rain_sum", "temp_mean"),
-  d          = sampling_dates,
-  i          = 7,               
-  m          = 8
+  ref_date   = sampling_dates,
+  interval   = 7,               
+  max_lag    = 8
 )
 
 head(met_agg)
@@ -145,7 +145,7 @@ res_glm <- ecoXCorr(
   value_cols    = "rain_sum",
   agg_fun       = "sum",
   response      = "individualCount",
-  lag_unit      = 7,
+  interval      = 7,
   max_lag       = 8,
   family        = "poisson"
 )
