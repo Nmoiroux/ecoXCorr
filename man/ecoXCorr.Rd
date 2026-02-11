@@ -12,8 +12,9 @@ ecoXCorr(
   value_cols,
   agg_fun = "mean",
   response,
-  lag_unit = 1,
+  interval = 1,
   max_lag,
+  shift = 0,
   random = "",
   family = "gaussian",
   na.rm = TRUE,
@@ -37,9 +38,12 @@ sampling dates.}
 
 \item{response}{Name of the response variable.}
 
-\item{lag_unit}{Length of the base lag interval (in days).}
+\item{interval}{Length of the base lag interval (in days).}
 
 \item{max_lag}{Maximum number of lag intervals.}
+
+\item{shift}{Integer specifying how many days the response date
+should be shifted back in time when constructing lag windows.}
 
 \item{random}{Optional random-effects structure (passed to
 \code{fit_models_by_lag}).}
@@ -118,7 +122,7 @@ date_col_resp    = "date",
 value_cols    = "rain_sum",
 agg_fun       = "sum",
 response      = "individualCount",
-lag_unit      = 7,
+interval      = 7,
 max_lag       = 8,
 random        = "(1|area/trap)",
 family        = "nbinom2"

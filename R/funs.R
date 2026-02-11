@@ -454,16 +454,16 @@ fit_models_by_lag <- function(data,
 #'   \code{data}. The column must be of class \code{Date} or \code{POSIXct}.
 #' @param value_cols Character vector giving the names of numeric variables
 #'   to be aggregated (e.g. rainfall, temperature).
-#' @param d Vector of reference *dates*. Can be of class \code{Date} or coercible
+#' @param ref_date Vector of reference *dates* \code{d}. Can be of class \code{Date} or coercible
 #'   to \code{Date}. Aggregations are computed independently for each date.
-#' @param i Integer giving the length of the base time *interval*, expressed in days.
+#' @param interval Integer giving the length of the base time *interval* \code{i}, expressed in days.
 #'   Each elementary lag block contains exactly \code{i} calendar days.
 #'   (e.g. \code{1} for daily data, \code{7} for weekly intervals,
 #'   \code{14} for fortnightly intervals).
-#' @param m Integer giving the *maximum* lag (number of intervals) to consider.
+#' @param max_lag Integer giving the *maximum* lag (number of intervals) \code{m} to consider.
 #'   All combinations of lag windows with \code{1 <= lag_end <= lag_start <= m}
 #'   are evaluated.
-#' @param x Integer specifying how many days the reference date \code{d}
+#' @param shift Integer specifying how many days \code{x} the reference date \code{d}
 #'   should be shifted back in time when constructing lag windows.
 #'
 #'   When \code{x = 0}, lag intervals can end exactly at and include the reference date
@@ -510,23 +510,28 @@ fit_models_by_lag <- function(data,
 #' data       = meteoMPL2023,
 #' date_col   = "date",
 #' value_cols = c("rain_sum", "temp_mean"),
-#' d          = sampling_dates,
-#' i          = 7,
-#' m          = 8
+#' ref_date   = sampling_dates,
+#' interval   = 7,
+#' max_lag    = 8
 #' )
 #'
 #' head(met_agg)
 #'
 #' @export
-aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
-																			 i = 1, # integer, in days (7 for weekly intervals, 14 for fortnight, 30 for months...)
-																			 m,
-																			 x = 0,
+aggregate_lagged_intervals <- function(data,date_col,value_cols,ref_date,
+                                       interval = 1, # integer, in days (7 for weekly intervals, 14 for fortnight, 30 for months...)
+																			 max_lag,
+																			 shift = 0,
 																			 funs = list(mean = mean,
 																			 						min = min,
 																			 						max  = max,
 																			 						sum  = sum),
 																			 na.rm = TRUE) {
+
+  m <- max_lag
+  i <- interval
+  d <- ref_date
+  x <- shift
 
 
 	# Sanity checks
@@ -539,6 +544,7 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 	stopifnot(i == as.integer(i)) # check if its an integer
 
 	d <- as.Date(d)
+
 
 
 	# Time unit handling
@@ -680,8 +686,10 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 #' @param value_cols Name of one meteorological variables to aggregate.
 #' @param response Name of the response variable.
 #' @param agg_fun Name (character string) of the aggregation function. Function must accept a numeric vector as first argument. Default to \code{"mean"}.
-#' @param lag_unit Length of the base lag interval (in days).
+#' @param interval Length of the base lag interval (in days).
 #' @param max_lag Maximum number of lag intervals.
+#' @param shift Integer specifying how many days the response date
+#'   should be shifted back in time when constructing lag windows.
 #' @param random Optional random-effects structure (passed to
 #'   \code{fit_models_by_lag}).
 #' @param family Model family (GLM or glmmTMB).
@@ -703,7 +711,7 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 #' value_cols    = "rain_sum",
 #' agg_fun       = "sum",
 #' response      = "individualCount",
-#' lag_unit      = 7,
+#' interval      = 7,
 #' max_lag       = 8,
 #' random        = "(1|area/trap)",
 #' family        = "nbinom2"
@@ -720,8 +728,9 @@ ecoXCorr <- function(
     value_cols,
     agg_fun = "mean",
     response,
-    lag_unit = 1,
+    interval = 1,
     max_lag,
+    shift = 0,
     random = "",
     family = "gaussian",
     na.rm = TRUE,
@@ -747,9 +756,10 @@ ecoXCorr <- function(
     data       = meteo_data,
     date_col   = date_col_meteo,
     value_cols = value_cols,
-    d          = sampling_dates,
-    i          = lag_unit,
-    m          = max_lag,
+    ref_date   = sampling_dates,
+    interval   = interval,
+    max_lag    = max_lag,
+    shift      = shift,
     funs       = funs,
     na.rm      = na.rm
   )

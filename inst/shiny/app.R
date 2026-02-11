@@ -47,7 +47,7 @@ ui <- fluidPage(
 
       h4("Lag structure"),
 
-      numericInput("lag_unit", "Lag unit (days)", value = 7, min = 1),
+      numericInput("interval", "Lag unit (days)", value = 7, min = 1),
       numericInput("max_lag",  "Maximum lag", value = 8, min = 1),
 
       hr(),
@@ -160,7 +160,7 @@ server <- function(input, output, session) {
       value_cols     = input$value_cols,
       agg_fun        = input$agg_fun,
       response       = input$response,
-      lag_unit       = input$lag_unit,
+      interval       = input$interval,
       max_lag        = input$max_lag,
       random         = input$random,
       family         = input$family
@@ -224,7 +224,7 @@ server <- function(input, output, session) {
       sprintf("  value_cols     = %s,", input$value_cols),
       sprintf("  agg_fun        = %s,", input$agg_fun),
       sprintf("  response       = %s,", input$response),
-      sprintf("  lag_unit       = %d,", input$lag_unit),
+      sprintf("  interval       = %d,", input$interval),
       sprintf("  max_lag        = %d,", input$max_lag),
       sprintf("  random         = %s,", input$random),
       sprintf("  family         = %s", input$family),")\n",

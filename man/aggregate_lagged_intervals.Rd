@@ -8,10 +8,10 @@ aggregate_lagged_intervals(
   data,
   date_col,
   value_cols,
-  d,
-  i = 1,
-  m,
-  x = 0,
+  ref_date,
+  interval = 1,
+  max_lag,
+  shift = 0,
   funs = list(mean = mean, min = min, max = max, sum = sum),
   na.rm = TRUE
 )
@@ -25,19 +25,19 @@ aggregate_lagged_intervals(
 \item{value_cols}{Character vector giving the names of numeric variables
 to be aggregated (e.g. rainfall, temperature).}
 
-\item{d}{Vector of reference *dates*. Can be of class \code{Date} or coercible
+\item{ref_date}{Vector of reference *dates* \code{d}. Can be of class \code{Date} or coercible
 to \code{Date}. Aggregations are computed independently for each date.}
 
-\item{i}{Integer giving the length of the base time *interval*, expressed in days.
+\item{interval}{Integer giving the length of the base time *interval* \code{i}, expressed in days.
 Each elementary lag block contains exactly \code{i} calendar days.
 (e.g. \code{1} for daily data, \code{7} for weekly intervals,
 \code{14} for fortnightly intervals).}
 
-\item{m}{Integer giving the *maximum* lag (number of intervals) to consider.
+\item{max_lag}{Integer giving the *maximum* lag (number of intervals) \code{m} to consider.
 All combinations of lag windows with \code{1 <= lag_end <= lag_start <= m}
 are evaluated.}
 
-\item{x}{Integer specifying how many days the reference date \code{d}
+\item{shift}{Integer specifying how many days \code{x} the reference date \code{d}
   should be shifted back in time when constructing lag windows.
 
   When \code{x = 0}, lag intervals can end exactly at and include the reference date
@@ -107,9 +107,9 @@ met_agg <- aggregate_lagged_intervals(
 data       = meteoMPL2023,
 date_col   = "date",
 value_cols = c("rain_sum", "temp_mean"),
-d          = sampling_dates,
-i          = 7,
-m          = 8
+ref_date   = sampling_dates,
+interval   = 7,
+max_lag    = 8
 )
 
 head(met_agg)
