@@ -108,9 +108,9 @@ met_agg <- aggregate_lagged_intervals(
 data       = meteoMPL2023,
 date_col   = "date",
 value_cols = c("rain_sum", "temp_mean"),
-d          = sampling_dates,
-i          = 7,
-m          = 8
+ref_date   = sampling_dates,
+interval   = 7,
+max_lag    = 8
 )
 
 albo_lag <- merge(met_agg, albopictusMPL2023, by = "date", all = TRUE)
