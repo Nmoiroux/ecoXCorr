@@ -190,8 +190,8 @@ plotCCM(res_glmm, model_outcome ="R2sign", threshold_p = 0.2)
 
 The modelling function used depends on the `random` and `family` arguments:
 
-- `random` is empty:  `stats::glm()`
-- `random` is specified OR `family` is a valid glmmTMB family: `glmmTMB::glmmTMB()`
+- `random` is empty:  [`stats::glm()`](https://rdrr.io/r/stats/glm.html)
+- `random` is specified OR `family` is a valid glmmTMB family: [`glmmTMB::glmmTMB()`](https://glmmtmb.github.io/glmmTMB/reference/glmmTMB.html)
 
 
 ## When should I use ecoXCorr?
