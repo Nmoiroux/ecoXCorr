@@ -436,7 +436,7 @@ fit_models_by_lag <- function(data,
 #' where \code{i} is the base interval length (in days), \code{m} is the maximum
 #' number of intervals considered, and \code{k, l} range from 1 to \code{m} with
 #' \code{k >= l}. The parameter \code{x} controls how many of the most recent
-#' time units (including \code{d} when \code{x >= 1}) are excluded before
+#' days (including \code{d} when \code{x >= 1}) are excluded before
 #' constructing the lag windows.
 #'
 #' The function supports multiple reference dates, multiple variables, and
@@ -462,7 +462,7 @@ fit_models_by_lag <- function(data,
 #' @param m Integer giving the *maximum* lag (number of intervals) to consider.
 #'   All combinations of lag windows with \code{1 <= lag_end <= lag_start <= m}
 #'   are evaluated.
-#' @param x Integer specifying how many most recent time steps (in reverse
+#' @param x Integer specifying how many most recent days (in reverse
 #'   chronological order) to exclude before the reference date \code{d} when
 #'   constructing lag windows.
 #'
@@ -475,8 +475,7 @@ fit_models_by_lag <- function(data,
 #'   \code{x} most recent time units from the aggregation.
 #'
 #'   This parameter is useful when the predictor measured at or immediately
-#'   before the sampling date should not contribute to the lagged summary
-#'   (e.g. to avoid temporal overlap or reverse causation).
+#'   before the sampling date should not contribute to the lagged summary.
 #' @param funs Named list of aggregation functions to apply to each variable.
 #'   Each function must accept a numeric vector as first argument. The names
 #'   of the list are used to construct output column names
