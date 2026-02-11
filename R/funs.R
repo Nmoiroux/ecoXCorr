@@ -89,7 +89,7 @@ plotCCM <- function(data,
 
 	# legend name
 	if (indicator == "R2sign"){
-	  name_legend <- paste("signed", R2_type, sep="\n")
+	  name_legend <- paste("signed", R2_type)
 	} else if (indicator == "d_aic"){
 	  name_legend <- "delta AIC"
 	} else {
@@ -107,7 +107,8 @@ plotCCM <- function(data,
 	plot <- ggplot(data = data, aes(lag_start, lag_end, fill = value)) +
 	  geom_tile() +
 	  geom_tile(data = maxdata , color = "deeppink3", linewidth = 1, show.legend = FALSE)+
-	  scale_x_reverse() +
+	  scale_x_reverse(breaks = breaks_extended(4)) +
+	  scale_y_continuous(breaks = breaks_extended(4)) +
 	  scale_fill_gradient2(
 			low = "blue",
 			high = "red",
@@ -120,7 +121,7 @@ plotCCM <- function(data,
 	  theme_bw()
 
 	# message
-	message(paste0("Cross correlation maps showing ",name_legend," of models fitted on ", unique(data$response)," with lagged effects of ", unique(data$predictor) ," as predictor. Pink-bordered square highlight the time lag with the highest absolute value of ",name_legend,". Grey squares show intervals whith adjusted (for multiple testing) p-values > ",threshold_p,"."))
+	message(paste0("Cross correlation maps showing `",name_legend,"` of models fitted on `", unique(data$response),"` with lagged effects of `", unique(data$predictor) ,"` as predictor. Pink-bordered square highlight the time lag with the highest absolute value of `",name_legend,"`. Grey squares show intervals whith adjusted (for multiple testing) p-values > ",threshold_p,"."))
 
 	# return plot
 	return(plot)
@@ -537,7 +538,7 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 	stopifnot(m >= 1, i >= 1)
 	stopifnot(i == as.integer(i)) # check if its an integer
 
-	d <- as.Date(d) - x
+	d <- as.Date(d)
 
 
 	# Time unit handling
@@ -562,10 +563,10 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 		k <- 1
 
 		for (end_lag in 1:m) {
-			end_date <- dd - (end_lag - 1) * step
+			end_date <- dd - x - (end_lag - 1) * step
 
 			for (start_lag in end_lag:m) {
-				start_date <- dd - start_lag * step + 1
+				start_date <- dd - x - start_lag * step + 1
 
 				intervals[[k]] <- data.frame(
 					date     = dd,
@@ -601,14 +602,14 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,d,
 
 			for (v in value_cols) {
 
-				x <- data[[v]][idx]
+				y <- data[[v]][idx]
 
-				if (length(x) == 0) {
+				if (length(y) == 0) {
 					has_missing <<- TRUE
 					vals <- rep(NA_real_, length(funs))
 				} else {
 					vals <- sapply(funs, function(f)
-						do.call(f, list(x, na.rm = na.rm))
+						do.call(f, list(y, na.rm = na.rm))
 					)
 				}
 

@@ -30,7 +30,8 @@ Imports:
     stats,
     performance,
     Rdpack,
-    shiny
+    shiny,
+    scales
 RdMacros: Rdpack
 Depends: 
     R (>= 3.5)
