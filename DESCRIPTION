@@ -1,7 +1,7 @@
 Package: ecoXCorr
 Type: Package
 Title: Lagged Cross-Correlation Analysis of Environmental Time Series
-Version: 0.1.5
+Version: 0.1.6
 Authors@R: c(
     person(given = "Nicolas", 
            family = "Moiroux", 
