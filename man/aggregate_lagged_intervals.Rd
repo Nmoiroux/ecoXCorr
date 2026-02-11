@@ -73,11 +73,12 @@ A data.frame with one row per reference date and lag window, containing:
 \description{
 This function computes aggregated values of one or several meteorological
 time series over all possible lagged time intervals defined relative to one
-or more reference dates. For each reference date \code{d}, lag windows are
-constructed backward in time as
-\eqn{[(d - x) - k \times i + 1,\; (d - x) - (l - 1) \times i]},
+or more reference dates.
 }
 \details{
+For each reference date \code{d}, lag windows are
+constructed backward in time as
+\eqn{[(d - x) - k \times i + 1,\; (d - x) - (l - 1) \times i]},
 where \code{x} shifts the reference date \code{d} back in time
 (excluding \code{d} when \code{x >= 1}), \code{i} is the base interval length (in days),
 \code{m} is the maximum number of intervals considered,
@@ -91,14 +92,6 @@ Reference dates for which at least one interval contains no observations are
 reported in the console as having missing data. Reference dates for which at
 least one interval partially lies outside the temporal bounds of the input
 time series are reported as having truncated intervals.
-
-
-Console messages are printed to inform the user of reference dates for which
-missing data or truncated intervals occurred.
-
-An interval is considered truncated if it extends
-beyond the temporal bounds of the input time series. An interval is considered
-missing if no observations fall within it.
 }
 \examples{
 sampling_dates <- unique(albopictusMPL2023$date)

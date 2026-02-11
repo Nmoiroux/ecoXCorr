@@ -431,23 +431,7 @@ fit_models_by_lag <- function(data,
 #'
 #' This function computes aggregated values of one or several meteorological
 #' time series over all possible lagged time intervals defined relative to one
-#' or more reference dates. For each reference date \code{d}, lag windows are
-#' constructed backward in time as
-#' \eqn{[(d - x) - k \times i + 1,\; (d - x) - (l - 1) \times i]},
-#'
-#' where \code{x} shifts the reference date \code{d} back in time
-#' (excluding \code{d} when \code{x >= 1}), \code{i} is the base interval length (in days),
-#' \code{m} is the maximum number of intervals considered,
-#' and \code{k, l} range from 1 to \code{m} with \code{k >= l}.
-#'
-#' The function supports multiple reference dates, multiple variables, and
-#' multiple aggregation functions, and returns all combinations as additional
-#' columns in the output data frame.
-#'
-#' Reference dates for which at least one interval contains no observations are
-#' reported in the console as having missing data. Reference dates for which at
-#' least one interval partially lies outside the temporal bounds of the input
-#' time series are reported as having truncated intervals.
+#' or more reference dates.
 #'
 #' @param data A data.frame containing the meteorological time series.
 #' @param date_col Character string giving the name of the date column in
@@ -494,14 +478,22 @@ fit_models_by_lag <- function(data,
 #'   }
 #'
 #' @details
-#' Console messages are printed to inform the user of reference dates for which
-#' missing data or truncated intervals occurred.
+#' For each reference date \code{d}, lag windows are
+#' constructed backward in time as
+#' \eqn{[(d - x) - k \times i + 1,\; (d - x) - (l - 1) \times i]},
+#' where \code{x} shifts the reference date \code{d} back in time
+#' (excluding \code{d} when \code{x >= 1}), \code{i} is the base interval length (in days),
+#' \code{m} is the maximum number of intervals considered,
+#' and \code{k, l} range from 1 to \code{m} with \code{k >= l}.
 #'
-#' An interval is considered truncated if it extends
-#' beyond the temporal bounds of the input time series. An interval is considered
-#' missing if no observations fall within it.
+#' The function supports multiple reference dates, multiple variables, and
+#' multiple aggregation functions, and returns all combinations as additional
+#' columns in the output data frame.
 #'
-
+#' Reference dates for which at least one interval contains no observations are
+#' reported in the console as having missing data. Reference dates for which at
+#' least one interval partially lies outside the temporal bounds of the input
+#' time series are reported as having truncated intervals.
 #'
 #' @examples
 #' sampling_dates <- unique(albopictusMPL2023$date)

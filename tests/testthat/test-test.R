@@ -7,10 +7,10 @@ test_that("aggregate_lagged_intervals returns expected number of lags", {
     data = meteoMPL2023,
     date_col = "date",
     value_cols = "rain_sum",
-    d = unique(albopictusMPL2023$date),
-    i = i,
-    m = m,
-    x = x,
+    ref_date = unique(albopictusMPL2023$date),
+    interval = i,
+    max_lag = m,
+    shift = x,
     funs = list(sum = sum)
   )
 
