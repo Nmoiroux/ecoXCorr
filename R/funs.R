@@ -797,6 +797,7 @@ ecoXCorr <- function(
   response_data["ID"] <- row.names(response_data)
 
 
+
   ## --- Merge with response data
   merged_data <- merge(
     met_agg,
