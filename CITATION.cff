@@ -1,18 +1,26 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
-authors:
-  - family-names: "Moiroux"
-  given-names: "Nicolas"
-  orcid: "https://orcid.org/0000-0001-6755-6167"
-  - family-names: "Bartholomée"
-  given-names: "Colombine"
-  orcid: "https://orcid.org/0000-0001-7291-5195"
-  - family-names: "Taconet"
-  given-names: "Paul"
-  orcid: "https://orcid.org/0000-0001-7429-7204"
+title: >-
+  ecoXCorr: An R Package for lagged cross-correlation
+  analysis of environmental time series
+message: 'If you use this software, please cite it as below.'
 type: software
-title: "ecoXCorr: An R Package for lagged cross-correlation analysis of environmental time series"
+authors:
+  - given-names: Nicolas
+    family-names: Moiroux
+    email: nicolas.moiroux@ird.fr
+    orcid: 'https://orcid.org/0000-0001-6755-6167'
+  - given-names: Colombine
+    family-names: Bartholomée
+    orcid: 'https://orcid.org/0000-0001-7291-5195'
+  - given-names: Paul
+    family-names: Taconet
+    orcid: 'https://orcid.org/0000-0001-7429-7204'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.18621481
+repository-code: 'https://github.com/Nmoiroux/ecoXCorr'
 version: 0.1.7
-doi: 10.5281/zenodo.18621481
-date-released: 2026-02-12
-url: "https://github.com/Nmoiroux/ecoXCorr"
+date-released: '2026-02-12'
