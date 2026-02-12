@@ -79,8 +79,8 @@ For each reference date `d`, all intervals $[d - k \times i + 1; d - (l-1) \time
 where `i` is the interval length (in days) and `k, l` range from 1 to `m` with `k >= l`.
 
 
-In the example below `i` (`interval`) is set to 7 days, indicting that the unit for time intervals and lags will be a week.
-`m` (`max_lag`) is set to 8, indicating that the maximum lag (between response and predictor variables) considered will be
+In the example below `i` (`interval`) was set to 7 days, indicating that the unit for time intervals and lags will be a week.
+`m` (`max_lag`) was set to 8, indicating that the maximum lag (between response and predictor variables) considered will be
 8 weeks (or $m \times i$ days)
 
 ```r
