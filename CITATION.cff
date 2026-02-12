@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Moiroux"
+  given-names: "Nicolas"
+  orcid: "https://orcid.org/0000-0001-6755-6167"
+  - family-names: "Bartholomée"
+  given-names: "Colombine"
+  orcid: "https://orcid.org/0000-0001-7291-5195"
+  - family-names: "Taconet"
+  given-names: "Paul"
+  orcid: "https://orcid.org/0000-0001-7429-7204"
+title: "ecoXCorr: An R Package for lagged cross-correlation analysis of environmental time series"
+version: 0.1.7
+doi: 10.5281/zenodo.18621481
+date-released: 2017-12-18
+url: "https://github.com/Nmoiroux/ecoXCorr"
