@@ -10,6 +10,7 @@ authors:
   - family-names: "Taconet"
   given-names: "Paul"
   orcid: "https://orcid.org/0000-0001-7429-7204"
+type: software
 title: "ecoXCorr: An R Package for lagged cross-correlation analysis of environmental time series"
 version: 0.1.7
 doi: 10.5281/zenodo.18621481
