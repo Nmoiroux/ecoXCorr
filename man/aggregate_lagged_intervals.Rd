@@ -25,15 +25,15 @@ aggregate_lagged_intervals(
 \item{value_cols}{Character vector giving the names of numeric variables
 to be aggregated (e.g. rainfall, temperature).}
 
-\item{ref_date}{Vector of reference *dates* \code{d}. Can be of class \code{Date} or coercible
+\item{ref_date}{Vector of reference dates \code{d}. Can be of class \code{Date} or coercible
 to \code{Date}. Aggregations are computed independently for each date.}
 
-\item{interval}{Integer giving the length of the base time *interval* \code{i}, expressed in days.
+\item{interval}{Integer giving the length of the base time interval \code{i}, expressed in days.
 Each elementary lag block contains exactly \code{i} calendar days.
 (e.g. \code{1} for daily data, \code{7} for weekly intervals,
 \code{14} for fortnightly intervals).}
 
-\item{max_lag}{Integer giving the *maximum* lag (number of intervals) \code{m} to consider.
+\item{max_lag}{Integer giving the maximum lag (number of intervals) \code{m} to consider.
 All combinations of lag windows with \code{1 <= lag_end <= lag_start <= m}
 are evaluated.}
 

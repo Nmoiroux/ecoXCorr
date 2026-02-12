@@ -11,11 +11,12 @@ ecoXCorr(
   date_col_resp = "date",
   value_cols,
   agg_fun = "mean",
-  response,
   interval = 1,
   max_lag,
   shift = 0,
-  random = "",
+  response,
+  covariates = character(0),
+  random = character(0),
   family = "gaussian",
   na.rm = TRUE,
   track = FALSE,
@@ -36,14 +37,16 @@ sampling dates.}
 
 \item{agg_fun}{Name (character string) of the aggregation function. Function must accept a numeric vector as first argument. Default to \code{"mean"}.}
 
-\item{response}{Name of the response variable.}
-
 \item{interval}{Length of the base lag interval (in days).}
 
 \item{max_lag}{Maximum number of lag intervals.}
 
 \item{shift}{Integer specifying how many days the response date
 should be shifted back in time when constructing lag windows.}
+
+\item{response}{Name of the response variable.}
+
+\item{covariates}{Optional fixed-effect covariates (adjustment covariates).}
 
 \item{random}{Optional random-effects structure (passed to
 \code{fit_models_by_lag}).}
@@ -63,14 +66,14 @@ A data frame with one row per lag window, containing:
     \item{lag_end}{End lag index of the aggregation window.}
     \item{response}{Name of the response variable.}
     \item{predictor}{Name of the predictor variable.}
-    \item{R2...}{Coefficient of determination (marginal \eqn{R^2} for mixed models).}
+    \item{R2...}{Model's coefficient of determination (marginal \eqn{R^2} for mixed models).}
     \item{betas}{Estimated beta parameter of the linear predictor.}
     \item{sign}{Sign of the estimated predictor effect (-1 or +1).}
     \item{d_aic}{AIC reduction compared to the null model.}
     \item{n}{Number of observations used to fit the model.}
     \item{p_value}{P-value associated with the predictor effect.}
     \item{weight}{Akaike weight.}
-    \item{p_adj}{P-value adjusted for multiple testing.}
+    \item{p_adj}{P-value of the estimated predictor effect, adjusted for multiple testing (false discovery rate method.}
   }
 }
 \description{
@@ -102,7 +105,7 @@ function:
   \item Fits the specified model,
   \item Extracts beta parameter of the linear predictor,
   \item Extracts the p-value of the predictor effect,
-  \item Computes AIC for the specified and null models,
+  \item Computes AIC for the specified and null models (i.e. excluding `predictors` in the fixed part),
   \item Computes the appropriate model\eqn{R^2} (marginal Nakagawa \eqn{R^2} for mixed models),
   \item Records the sign of the estimated effect and the sample size,
   \item Computes delta-AIC and Akaike weight of each model \insertCite{vandepolIdentifyingBestClimatic2016}{ecoXCorr},

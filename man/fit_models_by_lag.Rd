@@ -8,7 +8,8 @@ fit_models_by_lag(
   data,
   response,
   predictors,
-  random = "",
+  covariates = character(0),
+  random = character(0),
   family = "gaussian",
   min_n = 10,
   track = F,
@@ -25,6 +26,8 @@ the predictor variable(s) and optional random-effect variables.}
 \item{predictors}{Character vector of predictor names. Currently, only
 a single predictor is supported; providing more than one predictor
 will result in an error.}
+
+\item{covariates}{Character vector of predictor names to be included in the fixed part of the model to control for their effect.}
 
 \item{random}{Optional character string specifying random-effects terms or
 covariance structure to be added to the model formula (without a leading \code{+}), e.g.
@@ -50,14 +53,14 @@ A data frame with one row per lag window, containing:
     \item{lag_end}{End lag index of the aggregation window.}
     \item{response}{Name of the response variable.}
     \item{predictor}{Name of the predictor variable.}
-    \item{R2...}{Coefficient of determination (marginal \eqn{R^2} for mixed models).}
+    \item{R2...}{Model's coefficient of determination (marginal \eqn{R^2} for mixed models).}
     \item{betas}{Estimated beta parameter of the linear predictor.}
     \item{sign}{Sign of the estimated predictor effect (-1 or +1).}
     \item{d_aic}{AIC reduction compared to the null model.}
     \item{n}{Number of observations used to fit the model.}
     \item{p_value}{P-value associated with the predictor effect.}
     \item{weight}{Akaike weight.}
-    \item{p_adj}{P-value adjusted for multiple testing.}
+    \item{p_adj}{P-value of the estimated predictor effect, adjusted for multiple testing (false discovery rate method.}
   }
 }
 \description{
@@ -90,7 +93,7 @@ function:
   \item Fits the specified model,
   \item Extracts beta parameter of the linear predictor,
   \item Extracts the p-value of the predictor effect,
-  \item Computes AIC for the specified and null models,
+  \item Computes AIC for the specified and null models (i.e. excluding `predictors` in the fixed part),
   \item Computes the appropriate model\eqn{R^2} (marginal Nakagawa \eqn{R^2} for mixed models),
   \item Records the sign of the estimated effect and the sample size,
   \item Computes delta-AIC and Akaike weight of each model \insertCite{vandepolIdentifyingBestClimatic2016}{ecoXCorr},

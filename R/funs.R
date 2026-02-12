@@ -159,6 +159,8 @@ plotCCM <- function(data,
 #'   a single predictor is supported; providing more than one predictor
 #'   will result in an error.
 #'
+#' @param covariates Character vector of predictor names to be included in the fixed part of the model to control for their effect.
+#'
 #' @param random Optional character string specifying random-effects terms or
 #'   covariance structure to be added to the model formula (without a leading \code{+}), e.g.
 #'   \code{"(1 | site/year)"}, \code{"(1 | site) + (1 | year)"} or \code{"ar1(times + 0 | group)"} (\code{?glmmTMB::glmmTMB}).
@@ -185,7 +187,7 @@ plotCCM <- function(data,
 #'   \item Fits the specified model,
 #'   \item Extracts beta parameter of the linear predictor,
 #'   \item Extracts the p-value of the predictor effect,
-#'   \item Computes AIC for the specified and null models,
+#'   \item Computes AIC for the specified and null models (i.e. excluding `predictors` in the fixed part),
 #'   \item Computes the appropriate model\eqn{R^2} (marginal Nakagawa \eqn{R^2} for mixed models),
 #'   \item Records the sign of the estimated effect and the sample size,
 #'   \item Computes delta-AIC and Akaike weight of each model \insertCite{vandepolIdentifyingBestClimatic2016}{ecoXCorr},
@@ -202,14 +204,14 @@ plotCCM <- function(data,
 #'     \item{lag_end}{End lag index of the aggregation window.}
 #'     \item{response}{Name of the response variable.}
 #'     \item{predictor}{Name of the predictor variable.}
-#'     \item{R2...}{Coefficient of determination (marginal \eqn{R^2} for mixed models).}
+#'     \item{R2...}{Model's coefficient of determination (marginal \eqn{R^2} for mixed models).}
 #'     \item{betas}{Estimated beta parameter of the linear predictor.}
 #'     \item{sign}{Sign of the estimated predictor effect (-1 or +1).}
 #'     \item{d_aic}{AIC reduction compared to the null model.}
 #'     \item{n}{Number of observations used to fit the model.}
 #'     \item{p_value}{P-value associated with the predictor effect.}
 #'     \item{weight}{Akaike weight.}
-#'     \item{p_adj}{P-value adjusted for multiple testing.}
+#'     \item{p_adj}{P-value of the estimated predictor effect, adjusted for multiple testing (false discovery rate method.}
 #'   }
 #'
 #' @references
@@ -248,7 +250,8 @@ plotCCM <- function(data,
 fit_models_by_lag <- function(data,
 															response,
 															predictors,
-															random = "", # Random-effects terms to be added to the formulae, wihtout initial "+", e.g. "(a|b/c)+(a|d)"
+															covariates = character(0),
+															random = character(0), # Random-effects terms to be added to the formulae, wihtout initial "+", e.g. "(a|b/c)+(a|d)"
 															family = "gaussian",
 															min_n = 10,
 															track = F,
@@ -256,6 +259,15 @@ fit_models_by_lag <- function(data,
 
 	out <- data
 
+	if (length(covariates)>0){
+	  if (trimws(covariates)==""){
+	  covariates <- character(0)
+	}}
+
+	if (length(random)>0){
+	  if (trimws(random)==""){
+	    random <- character(0)
+	  }}
 
 	# Ensure response exists
 	stopifnot(response %in% names(out))
@@ -263,11 +275,16 @@ fit_models_by_lag <- function(data,
 	stopifnot(is.character(family))
 	stopifnot(family %in% c(.glmmtmb_family,.glm_family))
 
+	#
+	if (length(covariates)>0){
+	  stopifnot(all(covariates %in% names(out)))
+	}
+
 
 	# Bi- or multi-variate model ?
 	if (length(predictors) >1 ){
 		multiv <- TRUE
-		stop("The function does not support multiple predictors")
+		stop("The function does not support multiple predictors. You may specify parameter `covariates` instead")
 	}
 
 	# Unique lag windows
@@ -275,7 +292,7 @@ fit_models_by_lag <- function(data,
 	n_mod_to_fit <- nrow(lag_windows)
 
 	# mixed-effect model ?
-	if (nchar(random) > 0 ){
+	if (length(random) > 0 ){
 		mixed <- TRUE
 		if (n_mod_to_fit > 30){
 			message(
@@ -292,21 +309,22 @@ fit_models_by_lag <- function(data,
 	}
 
 	# Build formula
-	if (mixed == TRUE) {
-	  fml <- as.formula(
-	    paste(response, "~", paste(c(predictors,random), collapse = " + ")))
-	  fml_null <- as.formula(
-	    paste(response, "~", paste(c("1",random), collapse = " + ")))
+	if (length(predictors[-1])==0 & length(covariates)==0){
+	  fix_null <- "1"
 	} else {
-	  fml <- as.formula(
-	    paste(response, "~", paste(predictors, collapse = " + ")))
-	  fml_null <- as.formula(
-	    paste(response, "~ 1"))
+	  fix_null <- predictors[-1]
 	}
+
+  fml <- as.formula(
+    paste(response, "~", paste(c(predictors,covariates,random), collapse = " + ")))
+
+  fml_null <- as.formula(
+    paste(response, "~", paste(c(fix_null,covariates,random), collapse = " + ")))
+
 
 	mod_fun <- ifelse(mixed == T | (family %in% .glmmtmb_family), "glmmTMB", "glm")
 
-	message(paste0("The fitted models will be of the form: ",mod_fun,"(",deparse1(fml),", family=",family,")"))
+	message(paste0("The fitted models will be of the form: ",mod_fun,"(",deparse1(fml),", family=",family,")\n The null model(s) will be of the form: ",mod_fun,"(",deparse1(fml_null),", family=",family,")"))
 
 
 	results <- list()
@@ -676,12 +694,13 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,ref_date,
 #' @param date_col_meteo Name of the date column in \code{meteo_data}.
 #' @param date_col_resp Name of the date column in \code{response_data}.
 #' @param value_cols Name of one meteorological variables to aggregate.
-#' @param response Name of the response variable.
 #' @param agg_fun Name (character string) of the aggregation function. Function must accept a numeric vector as first argument. Default to \code{"mean"}.
 #' @param interval Length of the base lag interval (in days).
 #' @param max_lag Maximum number of lag intervals.
 #' @param shift Integer specifying how many days the response date
 #'   should be shifted back in time when constructing lag windows.
+#' @param response Name of the response variable.
+#' @param covariates Optional fixed-effect covariates (adjustment covariates).
 #' @param random Optional random-effects structure (passed to
 #'   \code{fit_models_by_lag}).
 #' @param family Model family (GLM or glmmTMB).
@@ -719,11 +738,12 @@ ecoXCorr <- function(
     date_col_resp    = "date",
     value_cols,
     agg_fun = "mean",
-    response,
     interval = 1,
     max_lag,
     shift = 0,
-    random = "",
+    response,
+    covariates = character(0),
+    random = character(0),
     family = "gaussian",
     na.rm = TRUE,
     track = FALSE,
@@ -776,6 +796,7 @@ ecoXCorr <- function(
     data       = merged_data,
     response   = response,
     predictors = predictors,
+    covariates = covariates,
     random     = random,
     family     = family,
     track      = track,
