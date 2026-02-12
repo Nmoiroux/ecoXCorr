@@ -150,8 +150,8 @@ plotCCM <- function(data,
 #' Depending on model specification (depending on \code{random} and/or \code{family}), \eqn{R^2} for \code{\link[glmmTMB]{glmmTMB}} models may not be computed: the returned error or warning is printed in the console.
 #'
 #' @param data A data frame containing, at minimum, the columns
-#'   \code{lag_start}, \code{lag_end}, \code{date}, the response variable,
-#'   the predictor variable(s) and optional random-effect variables.
+#'   \code{lag_start}, \code{lag_end}, \code{date}, the response variable, response unique identifier \code{ID},
+#'   the predictor variable(s) and optional covariates and random-effect variables.
 #'
 #' @param response Character string giving the name of the response variable.
 #'
@@ -262,7 +262,8 @@ fit_models_by_lag <- function(data,
 	if (length(covariates)>0){
 	  if (trimws(covariates)==""){
 	  covariates <- character(0)
-	}}
+	  }}
+	print(covariates)
 
 	if (length(random)>0){
 	  if (trimws(random)==""){
@@ -271,6 +272,7 @@ fit_models_by_lag <- function(data,
 
 	# Ensure response exists
 	stopifnot(response %in% names(out))
+	stopifnot("ID" %in% names(out))
 	stopifnot(all(predictors %in% names(out)))
 	stopifnot(is.character(family))
 	stopifnot(family %in% c(.glmmtmb_family,.glm_family))
@@ -294,19 +296,13 @@ fit_models_by_lag <- function(data,
 	# mixed-effect model ?
 	if (length(random) > 0 ){
 		mixed <- TRUE
-		if (n_mod_to_fit > 30){
-			message(
-				"There are ",	paste0(n_mod_to_fit)," models to be fitted, which may take some time..."
-			)
-		}
 	} else {
 		mixed <- FALSE
-		if (n_mod_to_fit > 100){
-		  message(
-		    "There are ",	paste0(n_mod_to_fit)," models to be fitted, which may take some time..."
-		  )
-		}
 	}
+
+	message(
+	  "There are ",	paste0(n_mod_to_fit)," models to be fitted, which may take some time..."
+	)
 
 	# Build formula
 	if (length(predictors[-1])==0 & length(covariates)==0){
@@ -332,6 +328,13 @@ fit_models_by_lag <- function(data,
 	warns <- c()
 	k <- 1
 
+	# check covariates are lag dependent
+	lag_dep_cov <- nrow(unique(out[, c("ID", covariates), drop=FALSE])) > length(unique(out[["ID"]]))
+
+	if (lag_dep_cov){
+	  message("Some covariates are lag-dependent, their is no unique null model, outcomes `weight` and `d_aic` might not be comparable. An additional ", paste0(n_mod_to_fit)," models to be fitted...")
+	}
+
 	for (i in seq_len(nrow(lag_windows))) {
 
 		ls <- lag_windows$lag_start[i]
@@ -351,11 +354,21 @@ fit_models_by_lag <- function(data,
 			print(lag_windows[i,])
 		}
 
-		# Fit null model (only required one time), allways the same
-		if (i==1 & mod_fun == "glmmTMB"){
-		  fit_null <- glmmTMB(fml_null, data = dat, family = family, ...)
-		} else if(i==1 & mod_fun == "glm"){
-		  fit_null <- glm(fml_null, data = dat, family = family, ...)
+		# Fit null model
+		if(i==1){
+
+		  if (mod_fun == "glmmTMB"){
+		    fit_null <- glmmTMB(fml_null, data = dat, family = family, ...)
+		  } else if(mod_fun == "glm"){
+		    fit_null <- glm(fml_null, data = dat, family = family, ...)
+		  }
+
+		} else if (lag_dep_cov){
+		    if (mod_fun == "glmmTMB"){
+		      fit_null <- glmmTMB(fml_null, data = dat, family = family, ...)
+		    } else if(mod_fun == "glm"){
+		      fit_null <- glm(fml_null, data = dat, family = family, ...)
+		    }
 		}
 
 		# Fit model and extract betas and p-value
@@ -780,6 +793,9 @@ ecoXCorr <- function(
   predictors <- paste0(value_cols,"_", agg_fun)
 
   stopifnot(predictors %in% names(met_agg))
+
+  ## --- Create an ID col in the response data
+  response_data["ID"] <- row.names(response_data)
 
 
   ## --- Merge with response data

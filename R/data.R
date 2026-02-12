@@ -18,6 +18,7 @@
 #'   \item{trap}{Identifier of the trap used for sampling.}
 #'   \item{area}{Identifier of the area where the trap is located.}
 #'   \item{date}{Sampling date (class \code{Date}).}
+#'   \item{ID}{Unique sampling event identifier.}
 #' }
 #'
 #' @details

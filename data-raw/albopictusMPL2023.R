@@ -15,7 +15,8 @@ albopictusMPL2023 <- read_tsv('inst/extdata/0004826-260129131611470.csv') %>%
   filter(species == "Aedes albopictus", eventDate != "2023", sex == "F") %>% # filter the dataset for female Ae. aedes albopictus
   select(-c(sex, occurrenceID)) %>%
   mutate(date = str_split_i(eventDate,"/",1) %>% ymd_hm() %>% date()) %>% # extract sampling date
-  filter(individualCount>0) # zero-truncated dataset
+  filter(individualCount>0) %>% # zero-truncated dataset
+  mutate(ID = rownames(.))
 
 
 usethis::use_data(albopictusMPL2023, overwrite = TRUE)

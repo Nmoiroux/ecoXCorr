@@ -18,8 +18,8 @@ fit_models_by_lag(
 }
 \arguments{
 \item{data}{A data frame containing, at minimum, the columns
-\code{lag_start}, \code{lag_end}, \code{date}, the response variable,
-the predictor variable(s) and optional random-effect variables.}
+\code{lag_start}, \code{lag_end}, \code{date}, the response variable, response \code{ID},
+the predictor variable(s) and optional covariates and random-effect variables.}
 
 \item{response}{Character string giving the name of the response variable.}
 

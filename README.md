@@ -104,6 +104,16 @@ head(met_agg)
 
 ### Join environmental and response data
 
+First check that response data has an `ID` unique identifier (if not, an `ID` field is created).
+`ID` field is required in the following step.
+
+```r
+if (!("ID" %in% names(albopictusMPL2023))){
+ albopictusMPL2023$ID <- rownames(ID)
+}
+
+```
+
 Each reference date is associated with multiple lag windows, resulting in a many-to-many join:
 
 ```r
