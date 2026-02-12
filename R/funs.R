@@ -263,7 +263,6 @@ fit_models_by_lag <- function(data,
 	  if (trimws(covariates)==""){
 	  covariates <- character(0)
 	  }}
-	print(covariates)
 
 	if (length(random)>0){
 	  if (trimws(random)==""){
