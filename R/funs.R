@@ -2,7 +2,7 @@
 #'
 #' This function visualises the strength and direction of associations between
 #' a response variable and a lagged predictor across multiple lag windows \insertCite{currieroCrossCorrelationMaps2005}{ecoXCorr}, using
-#' the output of \code{\link{fit_models_by_lag}}. The resulting plot is a
+#' the output of \code{\link[=fit_models_by_lag]{fit_models_by_lag()}}. The resulting plot is a
 #' two-dimensional "cross-correlation map", where each tile represents a
 #' lag window defined by \code{lag_start} and \code{lag_end}.
 #'
@@ -12,7 +12,7 @@
 #' The lag window yielding the maximum absolute value of \code{model_outcome} is highlighted
 #' with a coloured border.
 #'
-#' @param data A data.frame produced by \code{\link{fit_models_by_lag}}, containing
+#' @param data A data.frame produced by \code{\link[=fit_models_by_lag]{fit_models_by_lag()}}, containing
 #'   at least the columns \code{lag_start}, \code{lag_end}, \code{r2},
 #'   \code{p_value}, and \code{sign}.
 #' @param model_outcome Character string specifying the model's outcomes to plot. Either:
@@ -38,12 +38,12 @@
 #' are not displayed and appear in grey.
 #'
 #' This function does not perform any modelling itself; it is intended solely
-#' for visualising results obtained from \code{\link{fit_models_by_lag}}.
+#' for visualising results obtained from \code{\link[=fit_models_by_lag]{fit_models_by_lag()}}.
 #'
 #' @references
 #'  \insertAllCited{}
 #'
-#' @seealso \code{\link{fit_models_by_lag}}, \code{\link[ggplot2]{ggplot}}
+#' @seealso \code{\link[=fit_models_by_lag]{fit_models_by_lag()}}, \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
 #'
 #' @examples
 #' res_glm <- ecoXCorr(
@@ -141,13 +141,13 @@ plotCCM <- function(data,
 #'
 #' The modelling function used depends on the \code{random} and \code{family} arguments:
 #' \itemize{
-#'   \item \code{random} is not specified (default):  \code{\link[stats]{glm}}
-#'   \item \code{random} is note an empty string OR \code{family} is a valid glmmTMB family: \code{\link[glmmTMB]{glmmTMB}}
+#'   \item \code{random} is not specified (default):  \code{\link[stats:glm]{stats::glm()}}
+#'   \item \code{random} is note an empty string OR \code{family} is a valid glmmTMB family: \code{\link[glmmTMB:family_glmmTMB]{glmmTMB::nbinom2()}}
 #' }
 #'
 #' For mixed-effects models, marginal \eqn{R^2} (Nakagawa) is returned. For fixed-effects
-#' models, appropriate \eqn{R^2} is used (see \code{?performance::r2()}).
-#' Depending on model specification (depending on \code{random} and/or \code{family}), \eqn{R^2} for \code{\link[glmmTMB]{glmmTMB}} models may not be computed: the returned error or warning is printed in the console.
+#' models, appropriate \eqn{R^2} is used (see \code{\link[performance:r2]{performance::r2()}}).
+#' Depending on model specification (depending on \code{random} and/or \code{family}), \eqn{R^2} for \code{\link[glmmTMB:glmmTMB]{glmmTMB::glmmTMB()}} models may not be computed: the returned error or warning is printed in the console.
 #'
 #' @param data A data frame containing, at minimum, the columns
 #'   \code{lag_start}, \code{lag_end}, \code{date}, the response variable, response unique identifier \code{ID},
@@ -163,12 +163,12 @@ plotCCM <- function(data,
 #'
 #' @param random Optional character string specifying random-effects terms or
 #'   covariance structure to be added to the model formula (without a leading \code{+}), e.g.
-#'   \code{"(1 | site/year)"}, \code{"(1 | site) + (1 | year)"} or \code{"ar1(times + 0 | group)"} (\code{?glmmTMB::glmmTMB}).
+#'   \code{"(1 | site/year)"}, \code{"(1 | site) + (1 | year)"} or \code{"ar1(times + 0 | group)"} (\code{\link[glmmTMB:glmmTMB]{glmmTMB::glmmTMB()}}).
 #'   If empty (default), a fixed-effect model is fitted.
 #'
 #' @param family Character string. The name of a family function
 #'   to be used in GLM or GLMM models. Default to "gaussian" (Linear model).
-#'   see \code{?stats::family} and \code{?glmmTMB::family_glmmTMB} for valid family functions.
+#'   see \code{\link[stats:family]{stats::family()}} and \code{\link[glmmTMB:glmmTMB]{glmmTMB::glmmTMB()}} for valid family functions.
 #'
 #' @param min_n Minimum number of observations required to fit a model.
 #'   (Currently not enforced; retained for future extensions.)
@@ -176,7 +176,7 @@ plotCCM <- function(data,
 #' @param track If TRUE, lag window is printed in the console before model fitting.
 #'
 #' @param ... Additional arguments passed to the underlying modelling
-#'   function (\code{glm}, or \code{glmmTMB::glmmTMB}).
+#'   function (\code{\link[stats:glm]{stats::glm()}}, or \code{\link[glmmTMB:glmmTMB]{glmmTMB::glmmTMB()}}).
 #'
 #' @details
 #' For each unique combination of \code{lag_start} and \code{lag_end}, the
@@ -218,9 +218,9 @@ plotCCM <- function(data,
 #'  \insertAllCited{}
 #'
 #' @seealso
-#' \code{\link[glmmTMB]{glmmTMB}},
-#' \code{\link[performance]{r2}},
-#' \code{\link[performance]{r2_nakagawa}}
+#' \code{\link[glmmTMB:glmmTMB]{glmmTMB::glmmTMB()}},
+#' \code{\link[performance:r2]{performance::r2()}},
+#' \code{\link[performance:r2_nakagawa]{performance::r2_nakagawa()}}
 #'
 #' @examples
 #' sampling_dates <- unique(albopictusMPL2023$date)
@@ -694,8 +694,8 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,ref_date,
 
 #' Run a complete ecoXCorr analysis: aggregation + lagged modelling
 #'
-#' This wrapper function combines \code{\link{aggregate_lagged_intervals}}
-#' and \code{\link{fit_models_by_lag}} into a single workflow. It aggregates
+#' This wrapper function combines \code{\link[=aggregate_lagged_intervals]{aggregate_lagged_intervals()}}
+#' and \code{\link[=fit_models_by_lag]{fit_models_by_lag()}} into a single workflow. It aggregates
 #' environmental predictors over multiple lag windows relative to sampling
 #' dates, merges them with a response dataset, and fits regression models
 #' separately for each lag window.

@@ -42,7 +42,7 @@ in a zero-truncated dataset suitable for abundance modelling.
 
 The dataset can be used to illustrate lagged associations between
 environmental variables and mosquito abundance, for example in
-conjunction with the functions \code{aggregate_lagged_intervals()},
-\code{fit_models_by_lag()}, and \code{plotCCM()}.
+conjunction with the functions \code{\link[=aggregate_lagged_intervals]{aggregate_lagged_intervals()}},
+\code{\link[=fit_models_by_lag]{fit_models_by_lag()}}, and \code{\link[=plotCCM]{plotCCM()}}.
 }
 \keyword{datasets}

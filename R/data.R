@@ -28,8 +28,8 @@
 #'
 #' The dataset can be used to illustrate lagged associations between
 #' environmental variables and mosquito abundance, for example in
-#' conjunction with the functions \code{aggregate_lagged_intervals()},
-#' \code{fit_models_by_lag()}, and \code{plotCCM()}.
+#' conjunction with the functions \code{\link[=aggregate_lagged_intervals]{aggregate_lagged_intervals()}},
+#' \code{\link[=fit_models_by_lag]{fit_models_by_lag()}}, and \code{\link[=plotCCM]{plotCCM()}}.
 #'
 #' @source
 #' GBIF occurrence data:
@@ -54,9 +54,9 @@
 #' @format A data.frame with one row per day and the following variables:
 #' \describe{
 #'   \item{date}{Date of observation (class \code{Date}).}
-#'   \item{wind_mean}{Daily mean wind speed (m·s⁻¹).}
-#'   \item{wind_min}{Daily minimum wind speed (m·s⁻¹).}
-#'   \item{wind_max}{Daily maximum wind speed (m·s⁻¹).}
+#'   \item{wind_mean}{Daily mean wind speed (m/s).}
+#'   \item{wind_min}{Daily minimum wind speed (m/s).}
+#'   \item{wind_max}{Daily maximum wind speed (m/s).}
 #'   \item{temp_mean}{Daily mean air temperature (°C).}
 #'   \item{temp_min}{Daily minimum air temperature (°C).}
 #'   \item{temp_max}{Daily maximum air temperature (°C).}
@@ -86,7 +86,7 @@
 #' provided.
 #'
 #' This dataset is designed to be used in combination with
-#' \code{aggregate_lagged_intervals()} to generate lagged environmental
+#' \code{\link[=aggregate_lagged_intervals]{aggregate_lagged_intervals()}} to generate lagged environmental
 #' predictors for ecological or epidemiological modelling.
 #'
 #' @source

@@ -31,12 +31,12 @@ will result in an error.}
 
 \item{random}{Optional character string specifying random-effects terms or
 covariance structure to be added to the model formula (without a leading \code{+}), e.g.
-\code{"(1 | site/year)"}, \code{"(1 | site) + (1 | year)"} or \code{"ar1(times + 0 | group)"} (\code{?glmmTMB::glmmTMB}).
+\code{"(1 | site/year)"}, \code{"(1 | site) + (1 | year)"} or \code{"ar1(times + 0 | group)"} (\code{\link[glmmTMB:glmmTMB]{glmmTMB::glmmTMB()}}).
 If empty (default), a fixed-effect model is fitted.}
 
 \item{family}{Character string. The name of a family function
 to be used in GLM or GLMM models. Default to "gaussian" (Linear model).
-see \code{?stats::family} and \code{?glmmTMB::family_glmmTMB} for valid family functions.}
+see \code{\link[stats:family]{stats::family()}} and \code{\link[glmmTMB:glmmTMB]{glmmTMB::glmmTMB()}} for valid family functions.}
 
 \item{min_n}{Minimum number of observations required to fit a model.
 (Currently not enforced; retained for future extensions.)}
@@ -44,7 +44,7 @@ see \code{?stats::family} and \code{?glmmTMB::family_glmmTMB} for valid family f
 \item{track}{If TRUE, lag window is printed in the console before model fitting.}
 
 \item{...}{Additional arguments passed to the underlying modelling
-function (\code{glm}, or \code{glmmTMB::glmmTMB}).}
+function (\code{\link[stats:glm]{stats::glm()}}, or \code{\link[glmmTMB:glmmTMB]{glmmTMB::glmmTMB()}}).}
 }
 \value{
 A data frame with one row per lag window, containing:
@@ -76,13 +76,13 @@ Both fixed-effect and mixed-effect models are supported.
 
 The modelling function used depends on the \code{random} and \code{family} arguments:
 \itemize{
-  \item \code{random} is not specified (default):  \code{\link[stats]{glm}}
-  \item \code{random} is note an empty string OR \code{family} is a valid glmmTMB family: \code{\link[glmmTMB]{glmmTMB}}
+  \item \code{random} is not specified (default):  \code{\link[stats:glm]{stats::glm()}}
+  \item \code{random} is note an empty string OR \code{family} is a valid glmmTMB family: \code{\link[glmmTMB:family_glmmTMB]{glmmTMB::nbinom2()}}
 }
 
 For mixed-effects models, marginal \eqn{R^2} (Nakagawa) is returned. For fixed-effects
-models, appropriate \eqn{R^2} is used (see \code{?performance::r2()}).
-Depending on model specification (depending on \code{random} and/or \code{family}), \eqn{R^2} for \code{\link[glmmTMB]{glmmTMB}} models may not be computed: the returned error or warning is printed in the console.
+models, appropriate \eqn{R^2} is used (see \code{\link[performance:r2]{performance::r2()}}).
+Depending on model specification (depending on \code{random} and/or \code{family}), \eqn{R^2} for \code{\link[glmmTMB:glmmTMB]{glmmTMB::glmmTMB()}} models may not be computed: the returned error or warning is printed in the console.
 
 
 For each unique combination of \code{lag_start} and \code{lag_end}, the
@@ -133,7 +133,7 @@ head(res_glm)
 \insertAllCited{}
 }
 \seealso{
-\code{\link[glmmTMB]{glmmTMB}},
-\code{\link[performance]{r2}},
-\code{\link[performance]{r2_nakagawa}}
+\code{\link[glmmTMB:glmmTMB]{glmmTMB::glmmTMB()}},
+\code{\link[performance:r2]{performance::r2()}},
+\code{\link[performance:r2_nakagawa]{performance::r2_nakagawa()}}
 }

@@ -11,7 +11,7 @@ plotCCM(
 )
 }
 \arguments{
-\item{data}{A data.frame produced by \code{\link{fit_models_by_lag}}, containing
+\item{data}{A data.frame produced by \code{\link[=fit_models_by_lag]{fit_models_by_lag()}}, containing
 at least the columns \code{lag_start}, \code{lag_end}, \code{r2},
 \code{p_value}, and \code{sign}.}
 
@@ -36,7 +36,7 @@ A \code{ggplot2} object representing the cross-correlation map.
 \description{
 This function visualises the strength and direction of associations between
 a response variable and a lagged predictor across multiple lag windows \insertCite{currieroCrossCorrelationMaps2005}{ecoXCorr}, using
-the output of \code{\link{fit_models_by_lag}}. The resulting plot is a
+the output of \code{\link[=fit_models_by_lag]{fit_models_by_lag()}}. The resulting plot is a
 two-dimensional "cross-correlation map", where each tile represents a
 lag window defined by \code{lag_start} and \code{lag_end}.
 }
@@ -54,7 +54,7 @@ colour scale centred on zero. Lag windows with \code{p_value >= threshold_p}
 are not displayed and appear in grey.
 
 This function does not perform any modelling itself; it is intended solely
-for visualising results obtained from \code{\link{fit_models_by_lag}}.
+for visualising results obtained from \code{\link[=fit_models_by_lag]{fit_models_by_lag()}}.
 }
 \examples{
 res_glm <- ecoXCorr(
@@ -80,5 +80,5 @@ plotCCM(res_glm, model_outcome = "betas", threshold_p = 0.05)
 \insertAllCited{}
 }
 \seealso{
-\code{\link{fit_models_by_lag}}, \code{\link[ggplot2]{ggplot}}
+\code{\link[=fit_models_by_lag]{fit_models_by_lag()}}, \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
 }

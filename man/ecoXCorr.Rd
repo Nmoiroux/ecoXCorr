@@ -77,8 +77,8 @@ A data frame with one row per lag window, containing:
   }
 }
 \description{
-This wrapper function combines \code{\link{aggregate_lagged_intervals}}
-and \code{\link{fit_models_by_lag}} into a single workflow. It aggregates
+This wrapper function combines \code{\link[=aggregate_lagged_intervals]{aggregate_lagged_intervals()}}
+and \code{\link[=fit_models_by_lag]{fit_models_by_lag()}} into a single workflow. It aggregates
 environmental predictors over multiple lag windows relative to sampling
 dates, merges them with a response dataset, and fits regression models
 separately for each lag window.
@@ -88,13 +88,13 @@ Both fixed-effect and mixed-effect models are supported.
 
 The modelling function used depends on the \code{random} and \code{family} arguments:
 \itemize{
-  \item \code{random} is not specified (default):  \code{\link[stats]{glm}}
-  \item \code{random} is note an empty string OR \code{family} is a valid glmmTMB family: \code{\link[glmmTMB]{glmmTMB}}
+  \item \code{random} is not specified (default):  \code{\link[stats:glm]{stats::glm()}}
+  \item \code{random} is note an empty string OR \code{family} is a valid glmmTMB family: \code{\link[glmmTMB:family_glmmTMB]{glmmTMB::nbinom2()}}
 }
 
 For mixed-effects models, marginal \eqn{R^2} (Nakagawa) is returned. For fixed-effects
-models, appropriate \eqn{R^2} is used (see \code{?performance::r2()}).
-Depending on model specification (depending on \code{random} and/or \code{family}), \eqn{R^2} for \code{\link[glmmTMB]{glmmTMB}} models may not be computed: the returned error or warning is printed in the console.
+models, appropriate \eqn{R^2} is used (see \code{\link[performance:r2]{performance::r2()}}).
+Depending on model specification (depending on \code{random} and/or \code{family}), \eqn{R^2} for \code{\link[glmmTMB:glmmTMB]{glmmTMB::glmmTMB()}} models may not be computed: the returned error or warning is printed in the console.
 
 
 For each unique combination of \code{lag_start} and \code{lag_end}, the
