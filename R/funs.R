@@ -736,8 +736,7 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,ref_date,
 #' response      = "individualCount",
 #' interval      = 7,
 #' max_lag       = 8,
-#' random        = "(1|area/trap)",
-#' family        = "nbinom2"
+#' family        = "poisson"
 #' )
 #'
 #' head(res_glmm)

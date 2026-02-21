@@ -127,8 +127,7 @@ agg_fun       = "sum",
 response      = "individualCount",
 interval      = 7,
 max_lag       = 8,
-random        = "(1|area/trap)",
-family        = "nbinom2"
+family        = "poisson"
 )
 
 head(res_glmm)
