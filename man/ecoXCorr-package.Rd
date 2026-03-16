@@ -5,7 +5,7 @@
 \alias{ecoXCorr-package}
 \title{ecoXCorr: Lagged Cross-Correlation Analysis of Environmental Time Series}
 \description{
-Tools for analysing lagged relationships between environmental variables and ecological or epidemiological time series. The package implements a workflow to aggregate meteorological data over multiple lagged intervals, fit regression models for each lag window, and visualise effect strength and direction using cross-correlation maps (CCM).
+Tools for analysing lagged relationships between environmental variables and ecological or epidemiological time series. The package implements a workflow to aggregate meteorological data over multiple lagged intervals, fit regression models, including mixed-effect models using 'glmmTMB', for each lag window, and visualise varied models outcomes (effect strength and direction, model prediction error...) using cross-correlation maps ('CCM').
 }
 \seealso{
 Useful links:
