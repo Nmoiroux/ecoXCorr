@@ -1,5 +1,5 @@
 [![DOI](https://zenodo.org/badge/1147854443.svg)](https://doi.org/10.5281/zenodo.18600567)
-[![R-multiverse status](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fcommunity.r-multiverse.org%2Fapi%2Fpackages%2FpkgNAME&query=%24.Version&label=r-multiverse)](https://community.r-multiverse.org/EcoXCorr)
+[![R-multiverse status](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fcommunity.r-multiverse.org%2Fapi%2Fpackages%2FecoXCorr&query=%24.Version&label=r-multiverse)](https://community.r-multiverse.org/ecoXCorr)
 
 # ecoXCorr
 
