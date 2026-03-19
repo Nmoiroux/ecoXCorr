@@ -6,6 +6,9 @@
 \usage{
 ecoXCorrApp()
 }
+\value{
+No return value, the function is a wrapper for \code{\link[shiny:runApp]{shiny::runApp()}}
+}
 \description{
 This function launches an interactive Shiny application allowing users
 to run a complete ecoXCorr workflow (aggregation, lagged modelling and

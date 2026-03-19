@@ -12,7 +12,7 @@ fit_models_by_lag(
   random = character(0),
   family = "gaussian",
   min_n = 10,
-  track = F,
+  track = FALSE,
   ...
 )
 }

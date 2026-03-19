@@ -251,10 +251,10 @@ fit_models_by_lag <- function(data,
 															response,
 															predictors,
 															covariates = character(0),
-															random = character(0), # Random-effects terms to be added to the formulae, wihtout initial "+", e.g. "(a|b/c)+(a|d)"
+															random = character(0), # Random-effects terms to be added to the formula, without initial "+", e.g. "(a|b/c)+(a|d)"
 															family = "gaussian",
 															min_n = 10,
-															track = F,
+															track = FALSE,
 															...) {
 
 	out <- data
@@ -827,6 +827,8 @@ ecoXCorr <- function(
 #' to run a complete ecoXCorr workflow (aggregation, lagged modelling and
 #' visualisation) using either example datasets included in the package
 #' or user-provided data.
+#'
+#' @return No return value, the function is a wrapper for \code{\link[shiny:runApp]{shiny::runApp()}}
 #'
 #' @export
 ecoXCorrApp <- function() {
