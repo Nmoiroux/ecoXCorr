@@ -5,5 +5,5 @@ data-raw
 0004826-260129131611470\.csv$
 synop_2023\.csv$
 ^\.gitignore$
-rsconnect
 CITATION\.cff
+^inst/shiny/rsconnect$
