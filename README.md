@@ -25,7 +25,13 @@ Below is an exemple of figure computed using `ecoXCorr`.
 
 ## Installation
 
-Install the development version from GitHub:
+You can install the released version of **ecoXCorr** from
+[CRAN](https://CRAN.R-project.org) with :
+
+```R
+install.packages("ecoXCorr")
+```
+or the development version from GitHub: 
 
 ```r
 devtools::install_github("Nmoiroux/ecoXCorr")
