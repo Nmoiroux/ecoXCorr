@@ -1,8 +1,8 @@
+# ecoXCorr
 [![DOI](https://zenodo.org/badge/1147854443.svg)](https://doi.org/10.5281/zenodo.18600567)
 [![R-multiverse status](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fcommunity.r-multiverse.org%2Fapi%2Fpackages%2FecoXCorr&query=%24.Version&label=r-multiverse)](https://community.r-multiverse.org/ecoXCorr)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/ecoXCorr)](https://cran.r-project.org/package=ecoXCorr)
 [![](https://cranlogs.r-pkg.org/badges/ecoXCorr)](https://cran.r-project.org/package=ecoXCorr)
-# ecoXCorr
 
 **ecoXCorr** (pronounce "*Eco-Cross-Corr*") is an R package designed to explore **lagged associations between environmental time series and ecological or epidemiological responses** based on the method proposed by Curriero *et al.* (2005)[[1]](#1).  
 
