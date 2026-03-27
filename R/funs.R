@@ -395,13 +395,13 @@ fit_models_by_lag <- function(data,
 		},warning = function(w){
 		  warns <<- c(warns, paste0("Warning in R2 computing (performance::r2()):",
 		                            conditionMessage(w)))
-		  return(NA)
+		  return(r2(fit, null_model = fit_null))
 		} )
 
 		if (mixed == TRUE & !all(is.na(r2_res))){
-		  r2 <- r2_res[2]
+		  r2 <- unlist(r2_res[2])
 		}else if(mixed == FALSE & !all(is.na(r2_res))){
-		  r2 <- r2_res[1]
+		  r2 <- unlist(r2_res[1])
 		}else if(all(is.na(r2_res))){
 		  r2 <- NA
 		}
