@@ -210,6 +210,84 @@ The modelling function used depends on the `random` and `family` arguments:
 - `random` is specified OR `family` is a valid glmmTMB family: [`glmmTMB::glmmTMB()`](https://glmmtmb.github.io/glmmTMB/reference/glmmTMB.html)
 
 
+## Working with multiple independent time series
+
+`ecoXCorr` can handle datasets containing multiple independent time series
+(e.g. several sampling sites, traps, or individuals) using the `id_col`
+argument in `aggregate_lagged_intervals()`.
+
+In this case, lagged aggregations are computed **separately for each time series**,
+ensuring that values are not mixed across groups.
+
+### Example
+
+Here we artificially replicate the meteorological dataset to simulate two
+independent time series (e.g. two sites):
+
+```r
+# Create two identical time series with different IDs
+meteo_multi <- rbind(
+  transform(meteoMPL2023, site = "A"),
+  transform(meteoMPL2023, site = "B")
+)
+
+# Check structure
+head(meteo_multi)
+```
+We then aggregate lagged predictors independently for each site:
+```r
+sampling_dates <- unique(albopictusMPL2023$date)
+
+met_agg_multi <- aggregate_lagged_intervals(
+  data       = meteo_multi,
+  date_col   = "date",
+  value_cols = c("rain_sum"),
+  ref_date   = sampling_dates,
+  interval   = 7,
+  max_lag    = 4,
+  id_col     = "site"
+)
+```
+The resulting dataset contains aggregated values for each site and lag window:
+```r
+head(met_agg_multi)
+```
+You can then merge with a response dataset that also includes the same grouping variable:
+```r
+# Example: replicate response data as well
+albo_multi <- rbind(
+  transform(albopictusMPL2023, site = "A"),
+  transform(albopictusMPL2023, site = "B")
+)
+
+data_multi <- merge(
+  met_agg_multi,
+  albo_multi,
+  by = c("date", "site"),
+  all = TRUE
+)
+```
+Finally, fit lagged models as usual:
+```r
+res_multi <- fit_models_by_lag(
+  data       = data_multi,
+  response   = "individualCount",
+  predictors = "rain_sum_sum",
+  random     = "(1|site/trap)",
+  family     = "nbinom2"
+)
+```
+### Key point
+
+When id_col is used:
+
+lagged intervals are constructed within each group independently,
+no aggregation is performed across different time series,
+the output retains the grouping variable for downstream analyses.
+
+This is particularly useful for multi-site studies, repeated measurements,
+or hierarchical sampling designs.
+
 ## When should I use ecoXCorr?
 
 ecoXCorr is useful when:
