@@ -12,7 +12,7 @@ aggregate_lagged_intervals(
   ref_date,
   interval = 1,
   max_lag,
-  shift = 0,
+  shift = 1,
   funs = list(mean = mean, min = min, max = max, sum = sum),
   na.rm = TRUE
 )
@@ -53,11 +53,10 @@ are evaluated.}
   When \code{x = 0}, lag intervals can end exactly at and include the reference date
   \code{d}.
   When \code{x = 1}, the reference date itself is excluded and lag
-  intervals end at \code{d - 1}.
+  intervals end at \code{d - 1} (included).
   More generally, increasing
   \code{x} shifts the reference date \code{d} back in time and excludes the
   \code{x} most recent days from the aggregation.
-
   This parameter is useful when the predictor measured at or immediately
   before the sampling date should not contribute to the lagged summary.}
 
