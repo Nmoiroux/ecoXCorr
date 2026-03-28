@@ -169,3 +169,37 @@ test_that("interval length equals interval parameter (1d, 30 lags)", {
   # we add 1 as end_date (=ref_date when shift = 0) is included
   expect_equal(as.numeric(res$end - res$start + 1)[1:10], 1:10)
 })
+
+test_that("aggregate_lagged_intervals returns same values that simple code", {
+  
+  sampling_dates <- unique(albopictusMPL2023$date)[2:3]
+  
+  met_agg <- aggregate_lagged_intervals(
+    data       = meteoMPL2023,
+    date_col   = "date",
+    value_cols = c("rain_sum", "temp_mean"),
+    ref_date   = sampling_dates,
+    interval   = 7,               
+    max_lag    = 2,
+    shift = 1
+  )
+  
+  shift <- 1
+  end <- which(meteoMPL2023$date==sampling_dates[1]) - shift
+  start <- which(meteoMPL2023$date==sampling_dates[1]-7) - shift +1
+  filter <- meteoMPL2023[start:end,]
+
+  A <- data.frame(
+    start = min(filter$date),
+    end   = max(filter$date),
+    rain_sum_mean = mean(filter$rain_sum),
+    rain_sum_min  = min(filter$rain_sum),
+    rain_sum_max  = max(filter$rain_sum),
+    rain_sum_sum  = sum(filter$rain_sum)
+  )
+  
+  B <- met_agg[1,c(2,3,6:9)]
+  
+  testthat::expect_equal(A,B)
+  
+})
