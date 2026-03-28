@@ -14,7 +14,7 @@
 
 ## Bug fixes
 
-- Fixed aggregation interval: The function aggregate_lagged_intervals() has been corrected to properly include the last day of each interval in the aggregation. Previously, intervals were defined as start <= date < end, which systematically excluded the final day. This has now been changed to start <= date <= end, ensuring that all dates within the intended interval are considered when computing summary statistics. This fix guarantees that the aggregated results accurately reflect the intervals specified by the user.
+- Fixed aggregation interval: The function aggregate_lagged_intervals() has been corrected to properly include the last day of each interval in the aggregation. Previously, intervals were defined as start <= date < end, which systematically excluded the final day. This has now been changed to start <= date <= end, ensuring that all dates within the intended interval are considered when computing summary statistics. This fix guarantees that the aggregated results accurately reflect the intervals specified by the user. In addition, default for parameter `shift` has been set to `1`, i.e. intervals ends the day preceding `ref_date` (this latter being excluded).
 
 - Fixed an error occurring in `fit_models_by_lag()` during result aggregation:
 `
