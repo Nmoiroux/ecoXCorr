@@ -222,13 +222,13 @@ ensuring that values are not mixed across groups.
 ### Example
 
 Here we artificially replicate the meteorological dataset to simulate two
-independent time series (e.g. two sites):
+independent time series (e.g. two stations):
 
 ```r
 # Create two identical time series with different IDs
 meteo_multi <- rbind(
-  transform(meteoMPL2023, site = "A"),
-  transform(meteoMPL2023, site = "B")
+  transform(meteoMPL2023, station = "A"),
+  transform(meteoMPL2023, station = "B")
 )
 
 # Check structure
@@ -245,10 +245,10 @@ met_agg_multi <- aggregate_lagged_intervals(
   ref_date   = sampling_dates,
   interval   = 7,
   max_lag    = 4,
-  id_col     = "site"
+  id_col     = "station"
 )
 ```
-The resulting dataset contains aggregated values for each site and lag window:
+The resulting dataset contains aggregated values for each station and lag window:
 ```r
 head(met_agg_multi)
 ```
@@ -256,14 +256,14 @@ You can then merge with a response dataset that also includes the same grouping 
 ```r
 # Example: replicate response data as well
 albo_multi <- rbind(
-  transform(albopictusMPL2023, site = "A"),
-  transform(albopictusMPL2023, site = "B")
+  transform(albopictusMPL2023, station = "A"),
+  transform(albopictusMPL2023, station = "B")
 )
 
 data_multi <- merge(
   met_agg_multi,
   albo_multi,
-  by = c("date", "site"),
+  by = c("date", "station"),
   all = TRUE
 )
 ```
@@ -273,7 +273,7 @@ res_multi <- fit_models_by_lag(
   data       = data_multi,
   response   = "individualCount",
   predictors = "rain_sum_sum",
-  random     = "(1|site/trap)",
+  random     = "(1|trap)",
   family     = "nbinom2"
 )
 ```
@@ -285,8 +285,7 @@ lagged intervals are constructed within each group independently,
 no aggregation is performed across different time series,
 the output retains the grouping variable for downstream analyses.
 
-This is particularly useful for multi-site studies, repeated measurements,
-or hierarchical sampling designs.
+This is particularly useful for multi-site studies with independent recording of environmental data.
 
 ## When should I use ecoXCorr?
 
