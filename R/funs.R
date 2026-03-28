@@ -6,11 +6,11 @@
 #' two-dimensional "cross-correlation map", where each tile represents a
 #' lag window defined by \code{lag_start} and \code{lag_end}.
 #'
-#' The colour of each tile corresponds to \code{model_outcome}. Positive associations are shown in red, negative
+#' The color of each tile corresponds to \code{model_outcome}. Positive associations are shown in red, negative
 #' associations in blue, and non-significant or filtered values (using \code{threshold_p}) are shown in grey.
 #'
 #' The lag window yielding the maximum absolute value of \code{model_outcome} is highlighted
-#' with a coloured border.
+#' with a colored border.
 #'
 #' @param data A data.frame produced by \code{\link[=fit_models_by_lag]{fit_models_by_lag()}}, containing
 #'   at least the columns \code{lag_start}, \code{lag_end}, \code{r2},
@@ -33,8 +33,8 @@
 #'
 #' @details
 #' The x-axis corresponds to \code{lag_start} (displayed in reverse order), and
-#' the y-axis corresponds to \code{lag_end}. Tiles are coloured using a diverging
-#' colour scale centred on zero. Lag windows with \code{p_value >= threshold_p}
+#' the y-axis corresponds to \code{lag_end}. Tiles are colored using a diverging
+#' color scale centered on zero. Lag windows with \code{p_value >= threshold_p}
 #' are not displayed and appear in grey.
 #'
 #' This function does not perform any modelling itself; it is intended solely
