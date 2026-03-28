@@ -8,6 +8,7 @@ aggregate_lagged_intervals(
   data,
   date_col,
   value_cols,
+  id_col = NULL,
   ref_date,
   interval = 1,
   max_lag,
@@ -24,6 +25,15 @@ aggregate_lagged_intervals(
 
 \item{value_cols}{Character vector giving the names of numeric variables
 to be aggregated (e.g. rainfall, temperature).}
+
+\item{id_col}{Optional character string giving the name of a column
+  identifying independent time series (e.g. site, station, individual).
+  When provided, aggregation is performed separately within each level
+  of \code{id_col}, ensuring that lagged intervals do not combine values
+  from different time series.
+
+  If \code{NULL} (default), the input data are assumed to represent a
+  single continuous time series.}
 
 \item{ref_date}{Vector of reference dates \code{d}. Can be of class \code{Date} or coercible
 to \code{Date}. Aggregations are computed independently for each date.}
@@ -63,12 +73,14 @@ before aggregation. Passed to the aggregation functions (default: \code{TRUE}).}
 A data.frame with one row per reference date and lag window, containing:
   \itemize{
     \item \code{date}: reference date
-    \item \code{start}, \code{end}: start (inclusive) and end (exclusive) of
+    \item \code{start}, \code{end}: start (inclusive) and end (inclusive) of
       the aggregation interval
     \item \code{lag_start}, \code{lag_end}: lag indices defining the interval
     \item One column per combination of variable and aggregation function
       (e.g. \code{rain_mean}, \code{temperature_sum})
   }
+  If \code{id_col} is provided, the output includes this column to identify
+  the corresponding time series for each aggregated interval.
 }
 \description{
 This function computes aggregated values of one or several meteorological
@@ -92,6 +104,12 @@ Reference dates for which at least one interval contains no observations are
 reported in the console as having missing data. Reference dates for which at
 least one interval partially lies outside the temporal bounds of the input
 time series are reported as having truncated intervals.
+
+When \code{id_col} is specified, lagged aggregation is applied independently
+to each time series defined by this column. This is particularly useful when
+the dataset contains multiple independent temporal replicates (e.g. multiple
+sampling locations or experimental units). In that case, aggregation windows
+are constructed within each group, and no information is shared across groups.
 }
 \examples{
 sampling_dates <- unique(albopictusMPL2023$date)

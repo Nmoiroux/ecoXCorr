@@ -468,6 +468,15 @@ fit_models_by_lag <- function(data,
 #'   \code{data}. The column must be of class \code{Date} or \code{POSIXct}.
 #' @param value_cols Character vector giving the names of numeric variables
 #'   to be aggregated (e.g. rainfall, temperature).
+#' @param id_col Optional character string giving the name of a column
+#'   identifying independent time series (e.g. site, station, individual).
+#'   When provided, aggregation is performed separately within each level
+#'   of \code{id_col}, ensuring that lagged intervals do not combine values
+#'   from different time series.
+#'
+#'   If \code{NULL} (default), the input data are assumed to represent a
+#'   single continuous time series.
+#'      
 #' @param ref_date Vector of reference dates \code{d}. Can be of class \code{Date} or coercible
 #'   to \code{Date}. Aggregations are computed independently for each date.
 #' @param interval Integer giving the length of the base time interval \code{i}, expressed in days.
@@ -500,12 +509,14 @@ fit_models_by_lag <- function(data,
 #' @return A data.frame with one row per reference date and lag window, containing:
 #'   \itemize{
 #'     \item \code{date}: reference date
-#'     \item \code{start}, \code{end}: start (inclusive) and end (exclusive) of
+#'     \item \code{start}, \code{end}: start (inclusive) and end (inclusive) of
 #'       the aggregation interval
 #'     \item \code{lag_start}, \code{lag_end}: lag indices defining the interval
 #'     \item One column per combination of variable and aggregation function
 #'       (e.g. \code{rain_mean}, \code{temperature_sum})
 #'   }
+#'   If \code{id_col} is provided, the output includes this column to identify
+#'   the corresponding time series for each aggregated interval.
 #'
 #' @details
 #' For each reference date \code{d}, lag windows are
@@ -524,6 +535,12 @@ fit_models_by_lag <- function(data,
 #' reported in the console as having missing data. Reference dates for which at
 #' least one interval partially lies outside the temporal bounds of the input
 #' time series are reported as having truncated intervals.
+#' 
+#' When \code{id_col} is specified, lagged aggregation is applied independently
+#' to each time series defined by this column. This is particularly useful when
+#' the dataset contains multiple independent temporal replicates (e.g. multiple
+#' sampling locations or experimental units). In that case, aggregation windows
+#' are constructed within each group, and no information is shared across groups.
 #'
 #' @examples
 #' sampling_dates <- unique(albopictusMPL2023$date)
@@ -540,7 +557,9 @@ fit_models_by_lag <- function(data,
 #' head(met_agg)
 #'
 #' @export
-aggregate_lagged_intervals <- function(data,date_col,value_cols,ref_date,
+aggregate_lagged_intervals <- function(data,date_col,value_cols,
+                                       id_col = NULL,
+                                       ref_date,
                                        interval = 1, # integer, in days (7 for weekly intervals, 14 for fortnight, 30 for months...)
 																			 max_lag,
 																			 shift = 0,
@@ -564,114 +583,147 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,ref_date,
 	stopifnot(is.list(funs), !is.null(names(funs)))
 	stopifnot(m >= 1, i >= 1)
 	stopifnot(i == as.integer(i)) # check if its an integer
-
+	
+	# Check time series structure
+	if (is.null(id_col)) {
+	  if (any(duplicated(data[[date_col]]))) {
+	    stop("Duplicated dates detected. Provide id_col if multiple time series are present.")
+	  }
+	} else {
+	  if (any(duplicated(data[, c(id_col, date_col)]))) {
+	    stop("Duplicated (id, date) combinations detected.")
+	  }
+	}
+	
+	# ref date to POSIX
 	d <- as.Date(d)
 
-
-
 	# Time unit handling
-
 	step <- i
 
-	# Time series limits
-	ts_min <- min(as.Date(data[[date_col]]), na.rm = TRUE)
-	ts_max <- max(as.Date(data[[date_col]]), na.rm = TRUE)
-
-	# Containers
-	results <- list()
-	missing_dates   <- as.Date(character(0))
-	truncated_dates <- as.Date(character(0))
-
-
-	# Loop over reference dates
-
-	for (dd in d) {
-
-		intervals <- list()
-		k <- 1
-
-		for (end_lag in 1:m) {
-			end_date <- dd - x - (end_lag - 1) * step
-
-			for (start_lag in end_lag:m) {
-				start_date <- dd - x - start_lag * step + 1
-
-				intervals[[k]] <- data.frame(
-					date     = dd,
-					start     = start_date,
-					end       = end_date,
-					lag_start = start_lag,
-					lag_end   = end_lag,
-					stringsAsFactors = FALSE
-				)
-				k <- k + 1
-			}
-		}
-
-		intervals <- do.call(rbind, intervals)
-
-		has_missing   <- FALSE
-		has_truncated <- FALSE
-
-
-		# Aggregation
-
-		agg_list <- lapply(seq_len(nrow(intervals)), function(j) {
-
-			# Check if interval exceeds time series bounds
-			if (intervals$start[j] < ts_min || intervals$end[j] > ts_max) {
-				has_truncated <<- TRUE
-			}
-
-			idx <- data[[date_col]] >= intervals$start[j] &
-				data[[date_col]] <  intervals$end[j]
-
-			out <- c()
-
-			for (v in value_cols) {
-
-				y <- data[[v]][idx]
-
-				if (length(y) == 0) {
-					has_missing <<- TRUE
-					vals <- rep(NA_real_, length(funs))
-				} else {
-					vals <- sapply(funs, function(f)
-						do.call(f, list(y, na.rm = na.rm))
-					)
-				}
-
-				names(vals) <- paste(v, names(funs), sep = "_")
-				out <- c(out, vals)
-			}
-
-			out
-		})
-
-		agg_df <- as.data.frame(do.call(rbind, agg_list))
-		rownames(agg_df) <- NULL
-
-		results[[length(results) + 1]] <- cbind(intervals, agg_df)
-
-		if (has_missing) {
-			missing_dates <- c(missing_dates, dd)
-		}
-
-		if (has_truncated) {
-			truncated_dates <- c(truncated_dates, dd)
-		}
+	# Split data by time series
+	if (is.null(id_col)) {
+	  data_list <- list(data)
+	  id_values <- NA
+	} else {
+	  data_list <- split(data, data[[id_col]])
+	  id_values <- names(data_list)
 	}
-
-
-	# Final assembly
-
-	out <- do.call(rbind, results)
-
-	out$date <- as.Date(out$date, origin = "1970-01-01")
+	
+	all_results <- list()
+	series_index <- 1
+	
+	for (s in seq_along(data_list)) {
+	  
+	  data <- data_list[[s]]
+	  
+  	# Time series limits
+  	ts_min <- min(as.Date(data[[date_col]]), na.rm = TRUE)
+  	ts_max <- max(as.Date(data[[date_col]]), na.rm = TRUE)
+  
+  	# Containers
+  	results <- list()
+  	missing_dates   <- as.Date(character(0))
+  	truncated_dates <- as.Date(character(0))
+  
+  
+  	# Loop over reference dates
+  
+  	for (dd in d) {
+  
+  		intervals <- list()
+  		k <- 1
+  
+  		for (end_lag in 1:m) {
+  			end_date <- dd - x - (end_lag - 1) * step
+  
+  			for (start_lag in end_lag:m) {
+  				start_date <- dd - x - start_lag * step + 1
+  
+  				intervals[[k]] <- data.frame(
+  					date     = dd,
+  					start     = start_date,
+  					end       = end_date,
+  					lag_start = start_lag,
+  					lag_end   = end_lag,
+  					stringsAsFactors = FALSE
+  				)
+  				k <- k + 1
+  			}
+  		}
+  
+  		intervals <- do.call(rbind, intervals)
+  
+  		has_missing   <- FALSE
+  		has_truncated <- FALSE
+  
+  
+  		# Aggregation
+  
+  		agg_list <- lapply(seq_len(nrow(intervals)), function(j) {
+  
+  			# Check if interval exceeds time series bounds
+  			if (intervals$start[j] < ts_min || intervals$end[j] > ts_max) {
+  				has_truncated <<- TRUE
+  			}
+  
+  			idx <- data[[date_col]] >= intervals$start[j] &
+  				data[[date_col]] <=  intervals$end[j]
+  
+  			out <- c()
+  
+  			for (v in value_cols) {
+  
+  				y <- data[[v]][idx]
+  
+  				if (length(y) == 0) {
+  					has_missing <<- TRUE
+  					vals <- rep(NA_real_, length(funs))
+  				} else {
+  					vals <- sapply(funs, function(f)
+  						do.call(f, list(y, na.rm = na.rm))
+  					)
+  				}
+  
+  				names(vals) <- paste(v, names(funs), sep = "_")
+  				out <- c(out, vals)
+  			}
+  
+  			out
+  		})
+  
+  		agg_df <- as.data.frame(do.call(rbind, agg_list))
+  		rownames(agg_df) <- NULL
+  
+  		results[[length(results) + 1]] <- cbind(intervals, agg_df)
+  
+  		if (has_missing) {
+  			missing_dates <- c(missing_dates, dd)
+  		}
+  
+  		if (has_truncated) {
+  			truncated_dates <- c(truncated_dates, dd)
+  		}
+  	}
+  
+  
+  	# Final assembly
+  
+  	out <- do.call(rbind, results)
+  	
+  	if (!is.null(id_col)) {
+  	  out[[id_col]] <- id_values[s]
+	}
+	
+	all_results[[series_index]] <- out
+	series_index <- series_index + 1
+	}
+	
+	out <- do.call(rbind, all_results)
+	
+	out$date  <- as.Date(out$date, origin = "1970-01-01")
 	out$start <- as.Date(out$start, origin = "1970-01-01")
 	out$end   <- as.Date(out$end,   origin = "1970-01-01")
-	#out$interval <- out$end - out$start # might be used for plots
-
 
 	# Console messages
 
