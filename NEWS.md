@@ -14,6 +14,8 @@
 
 ## Bug fixes
 
+- Fixed aggregation interval: The function aggregate_lagged_intervals() has been corrected to properly include the last day of each interval in the aggregation. Previously, intervals were defined as start <= date < end, which systematically excluded the final day. This has now been changed to start <= date <= end, ensuring that all dates within the intended interval are considered when computing summary statistics. This fix guarantees that the aggregated results accurately reflect the intervals specified by the user.
+
 - Fixed an error occurring in `fit_models_by_lag()` during result aggregation:
 `
 Error in match.names(clabs, names(xi)) : names do not match previous names
