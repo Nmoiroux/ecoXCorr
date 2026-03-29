@@ -13,7 +13,7 @@ ecoXCorr(
   agg_fun = "mean",
   interval = 1,
   max_lag,
-  shift = 0,
+  shift = -1,
   response,
   covariates = character(0),
   random = character(0),
