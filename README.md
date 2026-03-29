@@ -145,29 +145,6 @@ res_glm <- fit_models_by_lag(
 
 ```
 
-### One-step approach using the `ecoXCorr()` wrapper function:
-
-This approach is allow to plot CCM in one step giving one dataset of a meteorological time series and one dataset of response variable. Aggregation is performed for a unique time series (e.g. from only one station), a unique variable in the meteo dataset (argument `value_cols`) and according to a unique function (`agg_fun`). The resulting aggregated variable is used as the predictor in the modeling process. 
-
-
-```r
-?ecoXCorr()
-
-res_glm <- ecoXCorr(
-  meteo_data    = meteoMPL2023,
-  response_data = albopictusMPL2023,
-  date_col_meteo = "date",
-  date_col_resp = "date",
-  value_cols    = "rain_sum",
-  agg_fun       = "sum",
-  response      = "individualCount",
-  interval      = 7,
-  max_lag       = 8,
-  shift         = 1,
-  family        = "poisson"
-)
-```
- 
 ### Visualise results as cross-correlation maps
 
 ```r
@@ -287,6 +264,30 @@ no aggregation is performed across different time series,
 the output retains the grouping variable for downstream analyses.
 
 This is particularly useful for multi-site studies with independent recording of environmental data.
+
+
+## One-step approach using the `ecoXCorr()` wrapper function:
+
+This approach is allow to plot CCM in one step giving one dataset of a meteorological time series and one dataset of response variable. Aggregation is performed for a unique time series (e.g. from only one station), a unique variable in the meteo dataset (argument `value_cols`) and according to a unique function (`agg_fun`). The resulting aggregated variable is used as the predictor in the modeling process. 
+
+
+```r
+?ecoXCorr()
+
+res_glm <- ecoXCorr(
+  meteo_data    = meteoMPL2023,
+  response_data = albopictusMPL2023,
+  date_col_meteo = "date",
+  date_col_resp = "date",
+  value_cols    = "rain_sum",
+  agg_fun       = "sum",
+  response      = "individualCount",
+  interval      = 7,
+  max_lag       = 8,
+  shift         = 1,
+  family        = "poisson"
+)
+```
 
 ## When should I use ecoXCorr?
 
