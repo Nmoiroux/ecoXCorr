@@ -212,7 +212,7 @@ meteo_multi <- rbind(
 # Check structure
 head(meteo_multi)
 ```
-We then aggregate lagged predictors independently for each site:
+We then aggregate lagged predictors independently for each station:
 ```r
 sampling_dates <- unique(albopictusMPL2023$date)
 
