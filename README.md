@@ -83,7 +83,7 @@ Meteorological variables are aggregated over all possible lag windows defined by
 - a base interval length (`i`),
 - a maximum lag (`m`)
 
-For each reference date `d`, all intervals $[d - k \times i + 1; d - (l-1) \times i)]$ are generated,
+For each reference date `d`, all intervals $[(d-1) - k \times i + 1; (d-1) - (l-1) \times i)]$ are generated,
 where `i` is the interval length (in days) and `k, l` range from 1 to `m` with `k >= l`.
 
 
