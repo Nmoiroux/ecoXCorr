@@ -8,9 +8,9 @@
 
 It provides a coherent workflow to:
 
-1. Aggregate environmental variables over multiple lagged time windows  
+1. Aggregate environmental time series over multiple lagged time windows  
 2. Fit regression models across all lag structures  
-3. Visualise effect strength and direction using **cross-correlation maps** (CCM)
+3. Visualize effect strength and direction using **cross-correlation maps** (CCM)
 
 The package is particularly suited for studying **delayed environmental effects**, such as the influence of meteorological conditions on insect abundance or disease dynamics.
 
