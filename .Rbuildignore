@@ -8,3 +8,4 @@ synop_2023\.csv$
 CITATION\.cff
 ^inst/shiny/rsconnect$
 ^cran-comments\.md$
+^CRAN-SUBMISSION$
