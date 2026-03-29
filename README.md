@@ -257,11 +257,11 @@ res_multi <- fit_models_by_lag(
 ```
 ### Key point
 
-When id_col is used:
+When `id_col` is used:
 
-lagged intervals are constructed within each group independently,
-no aggregation is performed across different time series,
-the output retains the grouping variable for downstream analyses.
+- lagged intervals are constructed within each group independently,
+- no aggregation is performed across different time series,
+- the output retains the grouping variable for downstream analyses.
 
 This is particularly useful for multi-site studies with independent recording of environmental data.
 
