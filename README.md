@@ -306,7 +306,7 @@ Typical applications include:
 - climate–biology interactions
 
 
-### References (Methods)
+### References (methods)
 
 <a id="1">[1]</a> Curriero FC, Shone SM, Glass GE. (2005) Cross correlation maps: a tool for visualizing and modeling time lagged associations. *Vector Borne Zoonotic Dis.* [doi:10.1089/vbz.2005.5.267](https://doi.org/10.1089/vbz.2005.5.267)
 
@@ -314,7 +314,7 @@ Typical applications include:
 
 <a id="3">[3]</a> Burnham, Kenneth P., and David R. Anderson, eds. Model Selection and Multimodel Inference. Springer, 2004. [https://doi.org/10.1007/b97636](https://doi.org/10.1007/b97636)
 
-### References (Use examples)
+### References (use examples)
 
 <a id="4">[4]</a>  Bartholomée C, Taconet P, Mercat M, Grail C, Bouhsira E, Fournet F, et al. Investigating the role of urban vegetation alongside other environmental variables in shaping Aedes albopictus presence and abundance in Montpellier, France. PLOS ONE. 2025;20: e0335793. [doi:10.1371/journal.pone.0335793](https://doi.org/10.1371/journal.pone.0335793)
 
