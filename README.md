@@ -147,7 +147,7 @@ res_glm <- fit_models_by_lag(
 
 ### One-step approach using the `ecoXCorr()` wrapper function:
 
-This approach is allow to plot CCM in one step giving one dataset of meteorological time series and one dataset of response variable. Aggregation is performed for only one variable in the meteo dataset (argument `value_cols`) according to one function (`agg_fun`). The resulting variable is used as the predictor in the modeling process. 
+This approach is allow to plot CCM in one step giving one dataset of a meteorological time series and one dataset of response variable. Aggregation is performed for a unique time series (e.g. from only one station), a unique variable in the meteo dataset (argument `value_cols`) and according to a unique function (`agg_fun`). The resulting aggregated variable is used as the predictor in the modeling process. 
 
 
 ```r
@@ -163,6 +163,7 @@ res_glm <- ecoXCorr(
   response      = "individualCount",
   interval      = 7,
   max_lag       = 8,
+  shift         = 1,
   family        = "poisson"
 )
 ```
