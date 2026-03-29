@@ -191,7 +191,7 @@ The modelling function used depends on the `random` and `family` arguments:
 ## Working with multiple independent time series
 
 `ecoXCorr` can handle datasets containing multiple independent time series
-(e.g. several sampling sites, traps, or individuals) using the `id_col`
+(e.g. from several stations) using the `id_col`
 argument in `aggregate_lagged_intervals()`.
 
 In this case, lagged aggregations are computed **separately for each time series**,
