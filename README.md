@@ -34,7 +34,9 @@ install.packages("ecoXCorr")
 or the development version from GitHub: 
 
 ```r
-devtools::install_github("Nmoiroux/ecoXCorr")
+# install.packages("devtools")
+library("devtools")
+install_github("Nmoiroux/ecoXCorr")
 ```
 
 ## Overview of the workflow
