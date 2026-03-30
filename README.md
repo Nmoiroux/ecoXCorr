@@ -190,6 +190,8 @@ The modelling function used depends on the `random` and `family` arguments:
 
 ## Working with multiple independent time series
 
+**Not available with the current CRAN version**
+
 `ecoXCorr` can handle datasets containing multiple independent time series
 (e.g. from several stations) using the `id_col`
 argument in `aggregate_lagged_intervals()`.
@@ -268,7 +270,7 @@ This is particularly useful for multi-site studies with independent recording of
 
 ## One-step approach using the `ecoXCorr()` wrapper function:
 
-This approach allows to plot CCM in one step giving one dataset of a meteorological time series and one dataset of response variable. Aggregation is performed for a unique time series (e.g. from only one station), a unique variable in the meteo dataset (argument `value_cols`) and according to a unique function (`agg_fun`). The resulting aggregated variable is used as the predictor in the modeling process. 
+This approach allows to plot CCM in one step giving one dataset of a meteorological time series and one dataset of response variable. Aggregation is performed for a **unique** time series (e.g. from only one station), a **unique** variable in the meteo dataset (argument `value_cols`) and according to a **unique** function (`agg_fun`). The resulting aggregated variable is used as the predictor in the modeling process. 
 
 
 ```r
