@@ -24,7 +24,7 @@ ecoXCorr(
 )
 }
 \arguments{
-\item{meteo_data}{Data frame containing a **unique** time series (i.e. from one station of site, no date replication) of meteorological variables.}
+\item{meteo_data}{Data frame containing a **unique** time series (i.e. from one station of site, no date duplication) of meteorological variables.}
 
 \item{response_data}{Data frame containing the response variable and
 sampling dates.}
