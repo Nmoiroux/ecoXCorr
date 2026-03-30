@@ -6,10 +6,23 @@
 
 **ecoXCorr** (pronounce "*Eco-Cross-Corr*") is an R package designed to explore **lagged associations between environmental time series and ecological or epidemiological responses** based on the method proposed by Curriero *et al.* (2005)[[1]](#1).
 
+### Table of content
+
 [Introduction](#introduction)
 
-[Installation instructions](#installation)
+[Installation](#installation)
 
+[Workflow overview](#overview-of-the-workflow)
+
+[Example](#example)
+
+[Working with multiple independent time series](#working-with-multiple-independent-time-series)
+
+[One-step approach using the ecoXCorr() wrapper function](#one-step-approach-using-the-ecoxcorr-wrapper-function)
+
+[References](#references)
+
+[Licence](#license)
 
 ## Introduction
 It provides a coherent workflow to:
@@ -26,6 +39,22 @@ Below is an example of figure computed using `ecoXCorr`.
 ![plot](man/figures/Rplot.jpg)
 
 *Fig. 1: Cross correlation maps showing the lagged effect of rainfall on Ae. albopictus abundance. Time lags are expressed in days prior to sampling. The signed R² reflects the variance explained by the explanatory variable, multiplied by the sign of the estimated effect. Pink-bordered square highlight the time lag with the highest R². Grey squares represent correlations with adjusted (for multiple testing) p-values > 0.05. Interpretation: mosquito abundance is best explain by rainfall recorded between 28 and 27 days before sampling.* 
+
+### When should I use ecoXCorr?
+
+ecoXCorr is useful when:
+
+- environmental drivers are expected to have delayed effects
+- the relevant time scale of these effects is unknown
+- you want a global view of lagged associations rather than testing a single lag
+
+Typical applications include:
+
+- variable and feature selection in modelling [[4]](#4)[[5]](#5)
+- vector ecology
+- disease ecology
+- environmental epidemiology
+- climate–biology interactions
 
 ---
 
@@ -299,24 +328,8 @@ res_glm <- ecoXCorr(
 )
 ```
 
-## When should I use ecoXCorr?
-
-ecoXCorr is useful when:
-
-- environmental drivers are expected to have delayed effects
-- the relevant time scale of these effects is unknown
-- you want a global view of lagged associations rather than testing a single lag
-
-Typical applications include:
-
-- variable and feature selection in modelling [[4]](#4)[[5]](#5)
-- vector ecology
-- disease ecology
-- environmental epidemiology
-- climate–biology interactions
-
-
-### References (methods)
+## References
+### Methods
 
 <a id="1">[1]</a> Curriero FC, Shone SM, Glass GE. (2005) Cross correlation maps: a tool for visualizing and modeling time lagged associations. *Vector Borne Zoonotic Dis.* [doi:10.1089/vbz.2005.5.267](https://doi.org/10.1089/vbz.2005.5.267)
 
@@ -324,7 +337,7 @@ Typical applications include:
 
 <a id="3">[3]</a> Burnham, Kenneth P., and David R. Anderson, eds. Model Selection and Multimodel Inference. Springer, 2004. [https://doi.org/10.1007/b97636](https://doi.org/10.1007/b97636)
 
-### References (use examples)
+### Use cases
 
 <a id="4">[4]</a>  Bartholomée C, Taconet P, Mercat M, Grail C, Bouhsira E, Fournet F, et al. Investigating the role of urban vegetation alongside other environmental variables in shaping Aedes albopictus presence and abundance in Montpellier, France. PLOS ONE. 2025;20: e0335793. [doi:10.1371/journal.pone.0335793](https://doi.org/10.1371/journal.pone.0335793)
 
