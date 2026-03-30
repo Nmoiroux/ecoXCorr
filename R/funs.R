@@ -751,7 +751,7 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,
 #' dates, merges them with a response dataset, and fits regression models
 #' separately for each lag window.
 #'
-#' @param meteo_data Data frame containing meteorological time series.
+#' @param meteo_data Data frame containing a *unique* time series (i.e. from one station of site, no date replication) of meteorological variables.
 #' @param response_data Data frame containing the response variable and
 #'   sampling dates.
 #' @param date_col_meteo Name of the date column in \code{meteo_data}.
