@@ -818,7 +818,7 @@ ecoXCorr <- function(
   
   # Check time series structure
   if (any(duplicated(meteo_data[[date_col_meteo]]))) {
-    stop("Duplicated dates detected. ecoXCorr wrapper function do not allow for multiple time series. Please use the normal workflow: see README file")
+    stop("Duplicated dates detected. ecoXCorr() wrapper function do not allow for multiple time series. Please use the normal workflow: see README file")
   }
 
   # create argument funs for `aggregate_lagged_intervals`
