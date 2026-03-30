@@ -155,13 +155,26 @@ if (!("ID" %in% names(albopictusMPL2023))){
 
 ```
 
-Each reference date is associated with multiple lag windows, resulting in a many-to-many join:
+Each observation (row in albopictusMPL2023), possibly on the same date, is associated with multiple lag windows, resulting in a many-to-many join:
 
 ```r
-data <- merge(met_agg,
-              albopictusMPL2023, by = "date", all = TRUE)
+data <- merge(albopictusMPL2023, met_agg, 
+                by = "date", all = TRUE)
 
 ```
+
+You might want to verify the resulting data set has the correct row number by multiplying the number of observations by the number of aggregation windows:
+
+```r
+# Number of windows is the sum of integers <= `m` (max_lag parameter), which formulae is (with `m`=8):
+n_windows <- 8*(8+1)/2
+# expected number of rows in the resulting data frame:
+expc_nrow <- nrow(albopictusMPL2023) * n_windows
+
+expc_nrow == nrow(data)
+
+```
+
 ### Fit models across lag windows
 Simple GLM example
 
