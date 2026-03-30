@@ -8,21 +8,14 @@
 
 ### Table of content
 
-[Introduction](#introduction)
-
-[Installation](#installation)
-
-[Workflow overview](#overview-of-the-workflow)
-
-[Example](#example)
-
-[Working with multiple independent time series](#working-with-multiple-independent-time-series)
-
-[One-step approach using the ecoXCorr() wrapper function](#one-step-approach-using-the-ecoxcorr-wrapper-function)
-
-[References](#references)
-
-[Licence](#license)
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Workflow overview](#overview-of-the-workflow)
+- [Example](#example)
+- [Working with multiple independent time series](#working-with-multiple-independent-time-series)
+- [One-step approach using the ecoXCorr() wrapper function](#one-step-approach-using-the-ecoxcorr-wrapper-function)
+- [References](#references)
+- [Licence](#license)
 
 ## Introduction
 It provides a coherent workflow to:
@@ -73,6 +66,7 @@ or the development version from GitHub:
 library("devtools")
 install_github("Nmoiroux/ecoXCorr")
 ```
+---
 
 ## Overview of the workflow
 
@@ -95,6 +89,8 @@ The package ships with two example datasets to illustrate this workflow:
 - `albopictusMPL2023`: mosquito sampling data (*Aedes albopictus*, Montpellier, 2023)
 
 The package includes a user-friendly Shiny application: [`ecoXCorrApp`](https://nicolas-moiroux.shinyapps.io/ecoXCorrApp/).
+
+---
 
 ## Example
 
@@ -224,6 +220,7 @@ The modelling function used depends on the `random` and `family` arguments:
 - `random` is empty:  [`stats::glm()`](https://rdrr.io/r/stats/glm.html)
 - `random` is specified OR `family` is a valid glmmTMB family: [`glmmTMB::glmmTMB()`](https://glmmtmb.github.io/glmmTMB/reference/glmmTMB.html)
 
+---
 
 ## Working with multiple independent time series
 
@@ -304,6 +301,7 @@ When `id_col` is used:
 
 This is particularly useful for multi-site studies with independent recording of environmental data.
 
+---
 
 ## One-step approach using the `ecoXCorr()` wrapper function:
 
@@ -328,6 +326,8 @@ res_glm <- ecoXCorr(
 )
 ```
 
+---
+
 ## References
 ### Methods
 
@@ -343,6 +343,7 @@ res_glm <- ecoXCorr(
 
 <a id="5">[5]</a>  Taconet P, Porciani A, Soma DD, Mouline K, Simard F, Koffi AA, et al. Data-driven and interpretable machine-learning modeling to explore the fine-scale environmental determinants of malaria vectors biting rates in rural Burkina Faso. Parasites & Vectors. 2021;14: 345. [doi:10.1186/s13071-021-04851-x](https://doi.org/10.1186/s13071-021-04851-x)
 
+---
 
-### License 
+## License 
 This package is released under the [GPL-3 License](https://www.gnu.org/licenses/gpl-3.0-standalone.html). 
