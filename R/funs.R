@@ -590,7 +590,7 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,
 	  }
 	} else {
 	  if (any(duplicated(data[, c(id_col, date_col)]))) {
-	    stop("Duplicated (id, date) combinations detected.")
+	    stop("Duplicated (id_col, date_col) combinations detected.")
 	  }
 	}
 	
