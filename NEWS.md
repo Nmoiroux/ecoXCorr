@@ -1,3 +1,8 @@
+# ecoXCorr 0.2.1
+
+- Add a warning when providing `ecoXCorr()` function with multiple time series (i.e. when duplicated dates are found in `meteo_data`)
+
+
 # ecoXCorr 0.2.0
 
 ## New features
