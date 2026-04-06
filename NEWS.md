@@ -1,3 +1,9 @@
+# ecoXCorr 0.2.2
+
+- Correct default value for arg `shift` in `ecoXCorr()` function
+
+
+
 # ecoXCorr 0.2.1
 
 - Add a warning when providing `ecoXCorr()` function with multiple time series (i.e. when duplicated dates are found in `meteo_data`)
