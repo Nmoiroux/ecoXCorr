@@ -161,7 +161,8 @@ server <- function(input, output, session) {
       interval       = input$interval,
       max_lag        = input$max_lag,
       random         = input$random,
-      family         = input$family
+      family         = input$family,
+      shift          = 1
     )
   })
 
