@@ -1,6 +1,10 @@
 # ecoXCorr 0.2.2
 
-- Correct default value for arg `shift` in `ecoXCorr()` function
+## Bug fixes
+- Correct default value for arg `shift` in `ecoXCorr()` function (from -1 to 1)
+
+## Improvements
+- Correct R code output of the shiny app.
 
 
 

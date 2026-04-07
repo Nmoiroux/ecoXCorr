@@ -491,7 +491,7 @@ fit_models_by_lag <- function(data,
 #'
 #'   When \code{x = 0}, lag intervals can end exactly at and include the reference date
 #'   \code{d}.
-#'   When \code{x = 1}, the reference date itself is excluded and lag
+#'   When \code{x = 1} (default), the reference date itself is excluded and lag
 #'   intervals end at \code{d - 1} (included).
 #'   More generally, increasing
 #'   \code{x} shifts the reference date \code{d} back in time and excludes the
@@ -760,8 +760,18 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,
 #' @param agg_fun Name (character string) of the aggregation function. Function must accept a numeric vector as first argument. Default to \code{"mean"}.
 #' @param interval Length of the base lag interval (in days).
 #' @param max_lag Maximum number of lag intervals.
-#' @param shift Integer specifying how many days the response date
+#' @param shift Integer specifying how many days \code{x} the reference date \code{d}
 #'   should be shifted back in time when constructing lag windows.
+#'
+#'   When \code{x = 0}, lag intervals can end exactly at and include the reference date
+#'   \code{d}.
+#'   When \code{x = 1} (default), the reference date itself is excluded and lag
+#'   intervals end at \code{d - 1} (included).
+#'   More generally, increasing
+#'   \code{x} shifts the reference date \code{d} back in time and excludes the
+#'   \code{x} most recent days from the aggregation.
+#'   This parameter is useful when the predictor measured at or immediately
+#'   before the sampling date should not contribute to the lagged summary.
 #' @param response Name of the response variable.
 #' @param covariates Optional fixed-effect covariates (adjustment covariates).
 #' @param random Optional random-effects structure (passed to
@@ -774,6 +784,8 @@ aggregate_lagged_intervals <- function(data,date_col,value_cols,
 #' @inherit fit_models_by_lag details
 #' @inherit fit_models_by_lag return
 #' @inherit fit_models_by_lag references
+#' 
+#' @seealso [aggregate_lagged_intervals()] [fit_models_by_lag()]
 #'
 #'
 #' @examples
