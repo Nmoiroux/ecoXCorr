@@ -209,7 +209,14 @@ server <- function(input, output, session) {
   })
 
   # R code ----------------------------------------------------------
+  
+  
   output$rcode <- renderText({
+    if (nchar(input$random)==0) {
+      random <- "character(0)"
+    } else {
+      random <- input$random
+    }
     paste(
       "# Code used\n",
       "# install.packages(\"devtools\")",
@@ -225,7 +232,7 @@ server <- function(input, output, session) {
       sprintf("  response       = %s,", input$response),
       sprintf("  interval       = %d,", input$interval),
       sprintf("  max_lag        = %d,", input$max_lag),
-      sprintf("  random         = %s,", input$random),
+      sprintf("  random         = %s,", random),
       sprintf("  family         = %s", input$family),")\n",
       "plotCCM(results,",
       sprintf("  model_outcome = %s,", input$model_outcome),
