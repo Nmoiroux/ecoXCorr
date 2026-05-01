@@ -11,3 +11,4 @@ CITATION\.cff
 ^CRAN-SUBMISSION$
 ^\.positai$
 ^\.claude$
+^dev$
