@@ -52,7 +52,7 @@ are evaluated.}
 
   When \code{x = 0}, lag intervals can end exactly at and include the reference date
   \code{d}.
-  When \code{x = 1}, the reference date itself is excluded and lag
+  When \code{x = 1} (default), the reference date itself is excluded and lag
   intervals end at \code{d - 1} (included).
   More generally, increasing
   \code{x} shifts the reference date \code{d} back in time and excludes the
