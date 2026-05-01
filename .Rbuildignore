@@ -9,3 +9,5 @@ CITATION\.cff
 ^inst/shiny/rsconnect$
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
+^\.positai$
+^\.claude$
